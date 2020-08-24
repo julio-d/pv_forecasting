@@ -234,15 +234,7 @@ for dia in [0,1,2,3]:
             elif dia==3:
                 time = dados['dia-3'].index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
-                nwpgrid['dia-3'][str(a)+'x'+str(b)]=nwpgrid['dia-3'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)
-            
-            
-#plot do ghi do csm
-cs.plot();
-
-plt.ylabel('Irradiance $W/m^2$');
-
-plt.title('Ineichen, climatological turbidity');
+                nwpgrid['dia-3'][str(a)+'x'+str(b)]=nwpgrid['dia-3'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)          
 
 #Weighted quantile regression
 
