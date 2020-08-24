@@ -18,28 +18,28 @@ from pvlib.iotools import read_tmy3
 
 ##### Importar dados ##########################################################
 
-filepath = r'C:\Users\Júlio\Desktop\pv_forecasting\dados\Dados_sincronizados_Alentejo2.xlsx'
+filepath = r'C:\Users\Júlio\Desktop\pv_forecasting\dados\Dados_sincronizados_Alentejo_V3.xlsx'
 
 #extrair info de "Dados_sincronizados_Alentejo2" ______________________________
 dados = {
-        "dia0": pd.read_excel(filepath, sheet_name = "Dia_Actual", header = [1]),
-        "dia-1": pd.read_excel(filepath, sheet_name = "Dia-1", header = [1]),
-        "dia-2": pd.read_excel(filepath, sheet_name = "Dia-2", header = [1]),
-        "dia-3": pd.read_excel(filepath, sheet_name = "Dia-3", header = [1]),
+        "D": pd.read_excel(filepath, sheet_name = "D", header = [1]),
+        "D+1": pd.read_excel(filepath, sheet_name = "D+1", header = [1]),
+        "D+2": pd.read_excel(filepath, sheet_name = "D+2", header = [1]),
+        "D+3": pd.read_excel(filepath, sheet_name = "D+3", header = [1]),
         "locais": pd.read_excel(filepath, sheet_name = "Posiciones", header = [0])
 }
 
-dados["dia0"]["Data"] = dados["dia0"][['Fecha', 'Hora']].agg(' '.join, axis=1)
-dados["dia0"].set_index("Data", inplace = True)
+dados["D"]["Data"] = dados["D"][['Fecha', 'Hora']].agg(' '.join, axis=1)
+dados["D"].set_index("Data", inplace = True)
 
-dados["dia-1"]["Data"] = dados["dia-1"][['Fecha', 'Hora']].agg(' '.join, axis=1)
-dados["dia-1"].set_index("Data", inplace = True)
+dados["D+1"]["Data"] = dados["D+1"][['Fecha', 'Hora']].agg(' '.join, axis=1)
+dados["D+1"].set_index("Data", inplace = True)
 
-dados["dia-2"]["Data"] = dados["dia-2"][['Fecha', 'Hora']].agg(' '.join, axis=1)
-dados["dia-2"].set_index("Data", inplace = True)
+dados["D+2"]["Data"] = dados["D+2"][['Fecha', 'Hora']].agg(' '.join, axis=1)
+dados["D+2"].set_index("Data", inplace = True)
 
-dados["dia-3"]["Data"] = dados["dia-3"][['Fecha', 'Hora']].agg(' '.join, axis=1)
-dados["dia-3"].set_index("Data", inplace = True)
+dados["D+3"]["Data"] = dados["D+3"][['Fecha', 'Hora']].agg(' '.join, axis=1)
+dados["D+3"].set_index("Data", inplace = True)
 
 ##### Testar dados ############################################################
 
@@ -51,33 +51,33 @@ for k in range(n//24):
     n=n-1
 teste=teste.drop(labels=pd.date_range(start='2019/2/27', end='2019/2/28', freq='1H', closed='left')[1:])
 teste=teste.drop(labels=pd.date_range(start='2019/4/5', end='2019/4/6', freq='1H', closed='left')[1:])
-if (dados["dia0"].index.equals(teste)==True):
-    dados['dia0'].set_index(teste, inplace=True) #preciso index em datatimeindex p/ clearsky model
+if (dados["D"].index.equals(teste)==True):
+    dados['D'].set_index(teste, inplace=True) #preciso index em datatimeindex p/ clearsky model
 
 #testar datas dia -1 -> FALTA 28/02/2019 E 06/04/2019
 teste=pd.date_range(start='2017/1/2', end='2020/6/1', freq='1H', closed='left').drop(labels=pd.date_range(start='2019/2/28', end='2019/3/1', freq='1H', closed='left'))
 teste = teste.drop(labels=pd.date_range(start='2019/4/6', end='2019/4/7', freq='1H', closed='left'))
-if (dados["dia-1"].index.equals(teste)==True):
-    dados['dia-1'].set_index(teste, inplace=True) #preciso index em datatimeindex p/ clearsky model
+if (dados["D+1"].index.equals(teste)==True):
+    dados['D+1'].set_index(teste, inplace=True) #preciso index em datatimeindex p/ clearsky model
 
 #testar datas dia -2 -> FALTA 01/03/2019 E 06/04/2019
-teste=pd.date_range(start='2017/1/3', end='2020/6/2', freq='1H', closed='left')
+teste=pd.date_range(start='2017/1/3', end='2020/6/1', freq='1H', closed='left')
 teste=teste.drop(labels=pd.date_range(start='2019/3/1', end='2019/3/2', freq='1H', closed='left'))
 teste=teste.drop(labels=pd.date_range(start='2019/4/7', end='2019/4/8', freq='1H', closed='left'))
-if (dados["dia-2"].index.equals(teste)==True):
-    dados['dia-2'].set_index(teste, inplace=True) #preciso index em datatimeindex p/ clearsky model
+if (dados["D+2"].index.equals(teste)==True):
+    dados['D+2'].set_index(teste, inplace=True) #preciso index em datatimeindex p/ clearsky model
 
 #testar datas dia -3 -> FALTA 02/03/2019 E 07/04/2019
-teste=pd.date_range(start='2017/1/4', end='2020/6/3', freq='1H', closed='left')
+teste=pd.date_range(start='2017/1/4', end='2020/6/1', freq='1H', closed='left')
 teste=teste.drop(labels=pd.date_range(start='2019/3/2', end='2019/3/3', freq='1H', closed='left'))
 teste=teste.drop(labels=pd.date_range(start='2019/4/8', end='2019/4/9', freq='1H', closed='left'))
-if (dados["dia-3"].index.equals(teste)==True):
-    dados['dia-3'].set_index(teste, inplace=True) #preciso index em datatimeindex p/ clearsky model
+if (dados["D+3"].index.equals(teste)==True):
+    dados['D+3'].set_index(teste, inplace=True) #preciso index em datatimeindex p/ clearsky model
 
 
 
 #testar limites sup e inf das variaveis meteorologicas
-teste_lims=pd.concat([dados['dia0'], dados['dia-1'], dados['dia-2'], dados['dia-3']], axis=1, sort=False)
+teste_lims=pd.concat([dados['D'], dados['D+1'], dados['D+2'], dados['D+3']], axis=1, sort=False)
 
 teste_lims.filter(like='Radiación', axis=1).max().max(axis=0)
 teste_lims.filter(like='Fraccion total', axis=1).max().max(axis=0)
@@ -109,14 +109,14 @@ teste_lims.filter(like='Produção (MW)', axis=1).min().min(axis=0)
 
 
 #testar NaN 
-dados["dia0"].isnull().sum().sum(axis=0)
-dados["dia-1"].isnull().sum().sum(axis=0)
-dados["dia-2"].isnull().sum().sum(axis=0)
-dados["dia-3"].isnull().sum().sum(axis=0)
+dados["D"].isnull().sum().sum(axis=0)
+dados["D+1"].isnull().sum().sum(axis=0)
+dados["D+2"].isnull().sum().sum(axis=0)
+dados["D+3"].isnull().sum().sum(axis=0)
 
 ##### Descritive statistics ###################################################
 
-report = pp.ProfileReport(dados['dia0'])
+report = pp.ProfileReport(dados['D'])
 report.to_file('profile_report.html') #erro ?
 
 
@@ -124,71 +124,71 @@ report.to_file('profile_report.html') #erro ?
 
 #NWP grid _____________________________________________________________________
 
-#dia0 
+#D 
 nwp_grid0 = {
-        "central": dados["dia0"].iloc[:, 183:194],
-        "elev_solar": dados["dia0"].iloc[:, 194]
+        "central": dados["D"].iloc[:, 183:194],
+        "elev_solar": dados["D"].iloc[:, 194]
 }
 i=3
 cols = [0,1, i, i+1, i+2, i+3, i+4]
 for a in range(1,7):
     for b in range(1,7):
-        nwp_grid0[str(a)+'x'+str(b)] = dados["dia0"].iloc[:, cols]
+        nwp_grid0[str(a)+'x'+str(b)] = dados["D"].iloc[:, cols]
         i=i+5
         
 
-#dia -1
+#D+1
 nwp_grid1 = {
-        "central": dados["dia-1"].iloc[:, 183:194],
-        "elev_solar": dados["dia-1"].iloc[:, 194]
+        "central": dados["D+1"].iloc[:, 183:194],
+        "elev_solar": dados["D+1"].iloc[:, 194]
 }
 i=3
 cols = [0,1, i, i+1, i+2, i+3, i+4]
 for a in range(1,7):
     for b in range(1,7):
-        nwp_grid1[str(a)+'x'+str(b)] = dados["dia-1"].iloc[:, cols]
+        nwp_grid1[str(a)+'x'+str(b)] = dados["D+1"].iloc[:, cols]
         i=i+5
 
 
-#dia -2
+#D+2
 nwp_grid2 = {
-        "central": dados["dia-2"].iloc[:, 183:194],
-        "elev_solar": dados["dia-2"].iloc[:, 194]
+        "central": dados["D+2"].iloc[:, 183:194],
+        "elev_solar": dados["D+2"].iloc[:, 194]
 }
 i=3
 cols = [0,1, i, i+1, i+2, i+3, i+4]
 for a in range(1,7):
     for b in range(1,7):
-        nwp_grid2[str(a)+'x'+str(b)] = dados["dia-2"].iloc[:, cols]
+        nwp_grid2[str(a)+'x'+str(b)] = dados["D+2"].iloc[:, cols]
         i=i+5
 
 
-#dia -3
+#D+3
 nwp_grid3 = {
-        "central": dados["dia-3"].iloc[:, 183:194],
-        "elev_solar": dados["dia-3"].iloc[:, 194]
+        "central": dados["D+3"].iloc[:, 183:194],
+        "elev_solar": dados["D+3"].iloc[:, 194]
 }
 i=3
 cols = [0,1, i, i+1, i+2, i+3, i+4]
 for a in range(1,7):
     for b in range(1,7):
-        nwp_grid3[str(a)+'x'+str(b)] = dados["dia-3"].iloc[:, cols]
+        nwp_grid3[str(a)+'x'+str(b)] = dados["D+3"].iloc[:, cols]
         i=i+5
         
 nwpgrid = {
-        "dia0": nwp_grid0,
-        "dia-1": nwp_grid1,
-        "dia-2": nwp_grid2,
-        "dia-3": nwp_grid3
+        "D": nwp_grid0,
+        "D+1": nwp_grid1,
+        "D+2": nwp_grid2,
+        "D+3": nwp_grid3
 }
 
         
 #potencia gerada ______________________________________________________________
 producao = {
-        "dia0": dados["dia0"].iloc[:, 195],
-        "dia-1": dados["dia-1"].iloc[:, 195],
-        "dia-2": dados["dia-2"].iloc[:, 195],
-        "dia-3": dados["dia-3"].iloc[:, 195]
+        "D": dados["D"].iloc[:, 195],
+        "D+1": dados["D+1"].iloc[:, 195],
+        "D+2": dados["D+2"].iloc[:, 195],
+        "D+3": dados["D+3"].iloc[:, 195]
 }
 
 #localizacao dos pontos da grid
@@ -209,7 +209,6 @@ for a in [0,1,2,3,4,5,6]:
     for b in [0,1,2,3,4,5,6]:
         print(location[a,b,0], location[a,b,1])'''
 
-
 ##### Feature engineering #####################################################
 
 #Clear-sky model
@@ -220,22 +219,30 @@ for dia in [0,1,2,3]:
             local = Location(location[a,b,0], location[a,b,1])
             
             if dia==0:
-                time = dados['dia0'].index
+                time = dados['D'].index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
-                nwpgrid['dia0'][str(a)+'x'+str(b)]=nwpgrid['dia0'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)
+                nwpgrid['D'][str(a)+'x'+str(b)]=nwpgrid['D'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)
             elif dia==1:
-                time = dados['dia-1'].index
+                time = dados['D+1'].index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
-                nwpgrid['dia-1'][str(a)+'x'+str(b)]=nwpgrid['dia-1'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)
+                nwpgrid['D+1'][str(a)+'x'+str(b)]=nwpgrid['D+1'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)
             elif dia==2:
-                time = dados['dia-2'].index
+                time = dados['D+2'].index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
-                nwpgrid['dia-2'][str(a)+'x'+str(b)]=nwpgrid['dia-2'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)
+                nwpgrid['D+2'][str(a)+'x'+str(b)]=nwpgrid['D+2'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)
             elif dia==3:
-                time = dados['dia-3'].index
+                time = dados['D+3'].index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
-                nwpgrid['dia-3'][str(a)+'x'+str(b)]=nwpgrid['dia-3'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)          
+                nwpgrid['D+3'][str(a)+'x'+str(b)]=nwpgrid['D+3'][str(a)+'x'+str(b)].assign(csm_ghi=cs['ghi'].values)
+            
+'''teste do csm num ponto aleatorio da grid -> OK!
+local = Location(location[6,6,0], location[6,6,1])
+time = dados['D+2'].index
+cs = local.get_clearsky(time)
+'''
 
 #Weighted quantile regression
+
+
 
 
