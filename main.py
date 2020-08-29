@@ -148,6 +148,8 @@ nwp_grid0 = {
         "central": dados["D"].iloc[:, 183:194],
         "elev_solar": dados["D"].iloc[:, 194]
 }
+nwp_grid0['central']=nwp_grid0['central'].assign(producao=dados["D"].iloc[:, 195].values)
+
 i=3
 for a in range(1,7):
     for b in range(1,7):
@@ -161,6 +163,8 @@ nwp_grid1 = {
         "central": dados["D+1"].iloc[:, 183:194],
         "elev_solar": dados["D+1"].iloc[:, 194]
 }
+nwp_grid1['central']=nwp_grid1['central'].assign(producao=dados["D+1"].iloc[:, 195].values)
+
 i=3
 for a in range(1,7):
     for b in range(1,7):
@@ -174,6 +178,8 @@ nwp_grid2 = {
         "central": dados["D+2"].iloc[:, 183:194],
         "elev_solar": dados["D+2"].iloc[:, 194]
 }
+nwp_grid2['central']=nwp_grid2['central'].assign(producao=dados["D+2"].iloc[:, 195].values)
+
 i=3
 for a in range(1,7):
     for b in range(1,7):
@@ -187,6 +193,8 @@ nwp_grid3 = {
         "central": dados["D+3"].iloc[:, 183:194],
         "elev_solar": dados["D+3"].iloc[:, 194]
 }
+nwp_grid3['central']=nwp_grid3['central'].assign(producao=dados["D+3"].iloc[:, 195].values)
+
 i=3
 for a in range(1,7):
     for b in range(1,7):
@@ -201,23 +209,15 @@ nwpgrid = {
         "D+3": nwp_grid3
 }
 
-        
-#potencia gerada ______________________________________________________________
 
-producao = {
-        "D": dados["D"].iloc[:, 195],
-        "D+1": dados["D+1"].iloc[:, 195],
-        "D+2": dados["D+2"].iloc[:, 195],
-        "D+3": dados["D+3"].iloc[:, 195]
-}
 
 
 #localizacao dos pontos da grid________________________________________________
 
 location = np.zeros((7,7,2)) #indices dos eixos 0 e 1 sao o ponto da nwp grid
 i=0
-for a in [1,2,3,4,5,6]:
-    for b in [1,2,3,4,5,6]:
+for a in range(1,7):
+    for b in range(1,7):
         location[a, b, 0]=dados['locais']['Latitud (º)'][i]
         location[a, b, 1]=dados['locais']['Longitud (º)'][i]
         i+=1
@@ -238,15 +238,59 @@ for a in [0,1,2,3,4,5,6]:
 
 
 #Clear-sky model - adicionar colunas Ics e Inorm ______________________________
+
+'''utilizo o indice das colunas em vez do nome porque ao importar do excel, as colunas com
+nome igual sao lhe colocadas indicacoes '.X' sendo X um numero crescente. tentei alterar 
+pd.read_excel para alterar isso mas nao consegui pelo que optei por chamar as colunas pelo
+indice porqe esse mantem-se para qualquer ponto da grid'''
+
+#central
+local = Location(location[0,0,0], location[0,0,1]) #localizacao da central
+
+df=nwpgrid['D']['central'] 
+time = df.index
+cs = local.get_clearsky(time)  # df com ghi, dni, dhi
+df=df.assign(csm_ghi=cs['ghi'].values)
+df=df.assign(irr_norm=df['csm_ghi'].values)
+df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[1]]/df[df.columns[12]], df['irr_norm'])  
+nwpgrid['D']['central']=df 
+  
+
+df=nwpgrid['D+1']['central'] 
+time = df.index
+cs = local.get_clearsky(time)  # df com ghi, dni, dhi
+df=df.assign(csm_ghi=cs['ghi'].values)
+df=df.assign(irr_norm=df['csm_ghi'].values)
+df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[1]]/df[df.columns[12]], df['irr_norm'])  
+nwpgrid['D+1']['central']=df 
+  
+df=nwpgrid['D+2']['central'] 
+time = df.index
+cs = local.get_clearsky(time)  # df com ghi, dni, dhi
+df=df.assign(csm_ghi=cs['ghi'].values)
+df=df.assign(irr_norm=df['csm_ghi'].values)
+df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[1]]/df[df.columns[12]], df['irr_norm'])  
+nwpgrid['D+2']['central']=df         
+  
+  
+df=nwpgrid['D+3']['central'] 
+time = df.index
+cs = local.get_clearsky(time)  # df com ghi, dni, dhi
+df=df.assign(csm_ghi=cs['ghi'].values)
+df=df.assign(irr_norm=df['csm_ghi'].values)
+df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[1]]/df[df.columns[12]], df['irr_norm'])  
+nwpgrid['D+3']['central']=df 
+              
         
-for dia in [0,1,2,3]:
-    for a in [1,2,3,4,5,6]:
-        for b in [1,2,3,4,5,6]:
+#pontos nwp grid        
+for dia in range(0,4):
+    for a in range(1,7):
+        for b in range(1,7):
             local = Location(location[a,b,0], location[a,b,1])
             
             if dia==0:
                 df=nwpgrid['D'][str(a)+'x'+str(b)] 
-                time = dados['D'].index
+                time = df.index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
                 df=df.assign(csm_ghi=cs['ghi'].values)
                 df=df.assign(irr_norm=df['csm_ghi'].values)
@@ -255,7 +299,7 @@ for dia in [0,1,2,3]:
                 
             elif dia==1:
                 df=nwpgrid['D+1'][str(a)+'x'+str(b)] 
-                time = dados['D+1'].index
+                time = df.index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
                 df=df.assign(csm_ghi=cs['ghi'].values)
                 df=df.assign(irr_norm=df['csm_ghi'].values)
@@ -264,7 +308,7 @@ for dia in [0,1,2,3]:
                 
             elif dia==2:
                 df=nwpgrid['D+2'][str(a)+'x'+str(b)] 
-                time = dados['D+2'].index
+                time = df.index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
                 df=df.assign(csm_ghi=cs['ghi'].values)
                 df=df.assign(irr_norm=df['csm_ghi'].values)
@@ -273,7 +317,7 @@ for dia in [0,1,2,3]:
             
             elif dia==3:
                 df=nwpgrid['D+3'][str(a)+'x'+str(b)] 
-                time = dados['D+3'].index
+                time = df.index
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
                 df=df.assign(csm_ghi=cs['ghi'].values)
                 df=df.assign(irr_norm=df['csm_ghi'].values)
@@ -291,8 +335,8 @@ cs = local.get_clearsky(time)
         
 #Weighted quantile regression _________________________________________________
 
-aux = {'irradiancia': dados['D']['Radiación.36'],
-       'potencia': dados['D']['Produção (MW)']
+aux = {'irradiancia': nwpgrid['D']['central']['Radiación.36'],
+       'potencia': nwpgrid['D']['central']['producao']
 }
 
 #scatter plot dos pts  I e P na central
@@ -304,60 +348,70 @@ plt.ylabel('Potencia')
 data = pd.DataFrame (aux, columns = ['irradiancia','potencia'])
 mod = smf.quantreg('potencia ~ irradiancia', data)
 res = mod.fit(q=.5)
-print(res.summary())
+#print(res.summary())
 
-quantiles = np.arange(.05, .96, .1)
-
-def fit_model(q):
-    res = mod.fit(q=q)
-    return [q, res.params['Intercept'], res.params['irradiancia']] + res.conf_int().loc['irradiancia'].tolist()
-
-models = [fit_model(x) for x in quantiles]
-models = pd.DataFrame(models, columns=['q', 'a', 'b', 'cf_lower_bound', 'cf_upper_bound'])
-
-#minimos quadrados ordinarios p/ comparar com qr
-ols = smf.ols('potencia ~ irradiancia', data).fit()
-ols_ci = ols.conf_int().loc['irradiancia'].tolist()
-ols = dict(a = ols.params['Intercept'],
-           b = ols.params['irradiancia'],
-           lb = ols_ci[0],
-           ub = ols_ci[1])
-
-#comparacao ols vs qr
-print(models)
-print(ols)
-
-#plot1
-x = np.arange(data.irradiancia.min(), data.irradiancia.max(), 50)
-get_y = lambda a, b: a + b * x
-
-fig, ax = plt.subplots(figsize=(8, 6))
-
-for i in range(models.shape[0]):
-    y = get_y(models.a[i], models.b[i])
-    ax.plot(x, y, linestyle='dotted', color='grey')
-
-y = get_y(ols['a'], ols['b'])
-
-ax.plot(x, y, color='red', label='OLS')
-ax.scatter(data['irradiancia'], data['potencia'], alpha=.05)
-legend = ax.legend()
-ax.set_xlabel('Irradiancia')
-ax.set_ylabel('Potência');
+intercept = res.params['Intercept']
+beta = res.params['irradiancia']
 
 
-#plot2
-n = models.shape[0]
-p1 = plt.plot(models.q, models.b, color='black', label='Quantile Reg.')
-p2 = plt.plot(models.q, models.cf_upper_bound, linestyle='dotted', color='black')
-p3 = plt.plot(models.q, models.cf_lower_bound, linestyle='dotted', color='black')
-p4 = plt.plot(models.q, [ols['b']] * n, color='red', label='OLS')
-p5 = plt.plot(models.q, [ols['lb']] * n, linestyle='dotted', color='red')
-p6 = plt.plot(models.q, [ols['ub']] * n, linestyle='dotted', color='red')
-plt.ylabel(r'$\beta_{irradiancia}$')
-plt.xlabel('Quantis')
-plt.legend()
-plt.show()
+
+
+
+
+#Obter Pcs  ___________________________________________________________________
+
+#P = intercept + beta . I 
+if intercept<10e-05:
+  intercept=0
+
+#D
+df=nwpgrid['D']['central']
+df=df.assign(Pcs = intercept + beta*df[df.columns[12]].values) #coluna 12 = Ics  
+nwpgrid['D']['central']=df 
+    
+#D+1
+df=nwpgrid['D+1']['central']
+df=df.assign(Pcs = intercept + beta*df[df.columns[12]].values) #coluna 12 = Ics  
+nwpgrid['D+1']['central']=df 
+
+#D+2
+df=nwpgrid['D+2']['central']
+df=df.assign(Pcs = intercept + beta*df[df.columns[12]].values) #coluna 12 = Ics  
+nwpgrid['D+2']['central']=df 
+
+#D+3
+df=nwpgrid['D+3']['central']
+df=df.assign(Pcs = intercept + beta*df[df.columns[12]].values) #coluna 12 = Ics  
+nwpgrid['D+3']['central']=df 
+
+
+
+
+#Normalizar P _________________________________________________________________
+
+#D
+df=nwpgrid['D']['central']
+df=df.assign(pot_norm=df['Pcs'].values)
+df['pot_norm']=np.where(df['pot_norm']>0, df[df.columns[11]]/df[df.columns[14]], df['pot_norm']) #11=pot e 14=Pcs   
+nwpgrid['D']['central']=df 
+    
+#D+1
+df=nwpgrid['D+1']['central']
+df=df.assign(pot_norm=df['Pcs'].values)
+df['pot_norm']=np.where(df['pot_norm']>0, df[df.columns[11]]/df[df.columns[14]], df['pot_norm']) #11=pot e 14=Pcs   
+nwpgrid['D+1']['central']=df 
+
+#D+2
+df=nwpgrid['D+2']['central']
+df=df.assign(pot_norm =df['Pcs'].values)
+df['pot_norm']=np.where(df['pot_norm']>0, df[df.columns[11]]/df[df.columns[14]], df['pot_norm']) #11=pot e 14=Pcs   
+nwpgrid['D+2']['central']=df 
+
+#D+3
+df=nwpgrid['D+3']['central']
+df=df.assign(pot_norm =df['Pcs'].values)
+df['pot_norm']=np.where(df['pot_norm']>0, df[df.columns[11]]/df[df.columns[14]], df['pot_norm']) #11=pot e 14=Pcs   
+nwpgrid['D+3']['central']=df 
 
 
 
@@ -366,6 +420,75 @@ plt.show()
 
 #variancia temporal -> apliquei a todas as variaveis
 
+#central
+df=nwpgrid['D']['central']
+    
+#temperatura
+df=df.assign(temp_var3=df[df.columns[0]].rolling(window=3, center=True).var())
+df=df.assign(temp_var7=df[df.columns[0]].rolling(window=7, center=True).var())
+df=df.assign(temp_var11=df[df.columns[0]].rolling(window=11, center=True).var())
+
+#irradiancia
+df=df.assign(irr_var3=df[df.columns[1]].rolling(window=3, center=True).var())
+df=df.assign(irr_var7=df[df.columns[1]].rolling(window=7, center=True).var())
+df=df.assign(irr_var11=df[df.columns[1]].rolling(window=11, center=True).var())
+
+#pressao
+df=df.assign(pres_var3=df[df.columns[2]].rolling(window=3, center=True).var())
+df=df.assign(pres_var7=df[df.columns[2]].rolling(window=7, center=True).var())
+df=df.assign(pres_var11=df[df.columns[2]].rolling(window=11, center=True).var())
+
+#velociade vento
+df=df.assign(vel_var3=df[df.columns[3]].rolling(window=3, center=True).var())
+df=df.assign(vel_var7=df[df.columns[3]].rolling(window=7, center=True).var())
+df=df.assign(vel_var11=df[df.columns[3]].rolling(window=11, center=True).var())
+
+#direcao vento
+df=df.assign(dir_var3=df[df.columns[4]].rolling(window=3, center=True).var())
+df=df.assign(dir_var7=df[df.columns[4]].rolling(window=7, center=True).var())
+df=df.assign(dir_var11=df[df.columns[4]].rolling(window=11, center=True).var())
+
+#humidade relativa
+df=df.assign(humr_var3=df[df.columns[5]].rolling(window=3, center=True).var())
+df=df.assign(humr_var7=df[df.columns[5]].rolling(window=7, center=True).var())
+df=df.assign(humr_var11=df[df.columns[5]].rolling(window=11, center=True).var())
+
+#frac total
+df=df.assign(ftotal_var3=df[df.columns[6]].rolling(window=3, center=True).var())
+df=df.assign(ftotal_var7=df[df.columns[6]].rolling(window=7, center=True).var())
+df=df.assign(ftotal_var11=df[df.columns[6]].rolling(window=11, center=True).var())
+
+#frac baixa
+df=df.assign(fbaixa_var3=df[df.columns[7]].rolling(window=3, center=True).var())
+df=df.assign(fbaixa_var7=df[df.columns[7]].rolling(window=7, center=True).var())
+df=df.assign(fbaixa_var11=df[df.columns[7]].rolling(window=11, center=True).var())
+
+#frac media
+df=df.assign(fmedia_var3=df[df.columns[8]].rolling(window=3, center=True).var())
+df=df.assign(fmedia_var7=df[df.columns[8]].rolling(window=7, center=True).var())
+df=df.assign(fmedia_var11=df[df.columns[8]].rolling(window=11, center=True).var())
+
+#frac alta
+df=df.assign(falta_var3=df[df.columns[9]].rolling(window=3, center=True).var())
+df=df.assign(falta_var7=df[df.columns[9]].rolling(window=7, center=True).var())
+df=df.assign(falta_var11=df[df.columns[9]].rolling(window=11, center=True).var())
+
+#precipitacao
+df=df.assign(prec_var3=df[df.columns[10]].rolling(window=3, center=True).var())
+df=df.assign(prec_var7=df[df.columns[10]].rolling(window=7, center=True).var())
+df=df.assign(prec_var11=df[df.columns[10]].rolling(window=11, center=True).var())
+
+#irradiancia normalizada
+df=df.assign(irrn_var3=df[df.columns[13]].rolling(window=3, center=True).var())
+df=df.assign(irrn_var7=df[df.columns[13]].rolling(window=7, center=True).var())
+df=df.assign(irrn_var11=df[df.columns[13]].rolling(window=11, center=True).var())
+
+nwpgrid['D']['central']=df
+
+
+
+
+#nwp grid
 for a in [1,2,3,4,5,6]:
   for b in [1,2,3,4,5,6]:
     
@@ -396,12 +519,84 @@ for a in [1,2,3,4,5,6]:
     df=df.assign(falta_var7=df[df.columns[6]].rolling(window=7, center=True).var())
     df=df.assign(falta_var11=df[df.columns[6]].rolling(window=11, center=True).var())
     
+    #irradiancia normalizada
+    df=df.assign(irrn_var3=df[df.columns[8]].rolling(window=3, center=True).var())
+    df=df.assign(irrn_var7=df[df.columns[8]].rolling(window=7, center=True).var())
+    df=df.assign(irrn_var11=df[df.columns[8]].rolling(window=11, center=True).var())
     
     nwpgrid['D'][str(a)+'x'+str(b)]=df
 
 
 
-#lags -> apliquei a todas as variaveis
+#lags 
+    
+#central
+df=nwpgrid['D']['central']
+    
+#temperatura
+df=df.assign(temp_lag1=df[df.columns[0]].shift(periods=1))
+df=df.assign(temp_lag2=df[df.columns[0]].shift(periods=2))
+df=df.assign(temp_lag3=df[df.columns[0]].shift(periods=3))
+
+#irradiancia
+df=df.assign(irr_lag1=df[df.columns[1]].shift(periods=1))
+df=df.assign(irr_lag2=df[df.columns[1]].shift(periods=2))
+df=df.assign(irr_lag3=df[df.columns[1]].shift(periods=3))
+
+#pressao
+df=df.assign(pres_lag1=df[df.columns[2]].shift(periods=1))
+df=df.assign(pres_lag2=df[df.columns[2]].shift(periods=2))
+df=df.assign(pres_lag3=df[df.columns[2]].shift(periods=3))
+
+#velociade vento
+df=df.assign(vel_lag1=df[df.columns[3]].shift(periods=1))
+df=df.assign(vel_lag2=df[df.columns[3]].shift(periods=2))
+df=df.assign(vel_lag3=df[df.columns[3]].shift(periods=3))
+
+#direcao vento
+df=df.assign(dir_lag1=df[df.columns[4]].shift(periods=1))
+df=df.assign(dir_lag2=df[df.columns[4]].shift(periods=2))
+df=df.assign(dir_lag3=df[df.columns[4]].shift(periods=3))
+
+#humidade relativa
+df=df.assign(humr_lag1=df[df.columns[5]].shift(periods=1))
+df=df.assign(humr_lag2=df[df.columns[5]].shift(periods=2))
+df=df.assign(humr_lag3=df[df.columns[5]].shift(periods=3))
+
+#frac total
+df=df.assign(ftotal_lag1=df[df.columns[6]].shift(periods=1))
+df=df.assign(ftotal_lag2=df[df.columns[6]].shift(periods=2))
+df=df.assign(ftotal_lag3=df[df.columns[6]].shift(periods=3))
+
+#frac baixa
+df=df.assign(fbaixa_lag1=df[df.columns[7]].shift(periods=1))
+df=df.assign(fbaixa_lag2=df[df.columns[7]].shift(periods=2))
+df=df.assign(fbaixa_lag3=df[df.columns[7]].shift(periods=3))
+
+#frac media
+df=df.assign(fmedia_lag1=df[df.columns[8]].shift(periods=1))
+df=df.assign(fmedia_lag2=df[df.columns[8]].shift(periods=2))
+df=df.assign(fmedia_lag3=df[df.columns[8]].shift(periods=3))
+
+#frac alta
+df=df.assign(falta_lag1=df[df.columns[9]].shift(periods=1))
+df=df.assign(falta_lag2=df[df.columns[9]].shift(periods=2))
+df=df.assign(falta_lag3=df[df.columns[9]].shift(periods=3))
+
+#precipitacao
+df=df.assign(prec_lag1=df[df.columns[10]].shift(periods=1))
+df=df.assign(prec_lag2=df[df.columns[10]].shift(periods=2))
+df=df.assign(prec_lag3=df[df.columns[10]].shift(periods=3))
+
+#irradiancia normalizada
+df=df.assign(irrn_lag1=df[df.columns[13]].shift(periods=1))
+df=df.assign(irrn_lag2=df[df.columns[13]].shift(periods=2))
+df=df.assign(irrn_lag3=df[df.columns[13]].shift(periods=3))
+
+
+nwpgrid['D']['central']=df
+
+#nwp grid
 for a in [1,2,3,4,5,6]:
   for b in [1,2,3,4,5,6]:
     
@@ -432,13 +627,9 @@ for a in [1,2,3,4,5,6]:
     df=df.assign(falta_lag2=df[df.columns[6]].shift(periods=2))
     df=df.assign(falta_lag3=df[df.columns[6]].shift(periods=3))
     
+    #irradiancia normalizada
+    df=df.assign(irrn_lag1=df[df.columns[8]].shift(periods=1))
+    df=df.assign(irrn_lag2=df[df.columns[8]].shift(periods=2))
+    df=df.assign(irrn_lag3=df[df.columns[8]].shift(periods=3))
+    
     nwpgrid['D'][str(a)+'x'+str(b)]=df
-
-
-    
-    
-
-
-
-
-
