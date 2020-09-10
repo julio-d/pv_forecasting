@@ -15,7 +15,15 @@ from pvlib import clearsky, atmosphere, solarposition
 from pvlib.location import Location
 from pvlib.iotools import read_tmy3
 from sklearn.decomposition import PCA
-
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.datasets import make_regression
+from sklearn.metrics import r2_score
+from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import mean_absolute_error
+import xgboost as xgb
+from catboost import CatBoostRegressor
+from sklearn.preprocessing import MinMaxScaler
 
 
 
@@ -27,7 +35,7 @@ filepath = r'C:\Users\Júlio\Desktop\pv_forecasting\dados\Dados_sincronizados_Al
 dados = {
         "D": pd.read_excel(filepath, sheet_name = "D", header = [1]),
         "D+1": pd.read_excel(filepath, sheet_name = "D+1", header = [1]),
-        "D0+2": pd.read_excel(filepath, sheet_name = "D+2", header = [1]),
+        "D+2": pd.read_excel(filepath, sheet_name = "D+2", header = [1]),
         "D+3": pd.read_excel(filepath, sheet_name = "D+3", header = [1]),
         "locais": pd.read_excel(filepath, sheet_name = "Posiciones", header = [0])
 }
@@ -156,8 +164,8 @@ dados["D+3"].isnull().sum().sum(axis=0)
 ##### Descritive statistics ###################################################
 
 
-report=ProfileReport(dados['D'])  
-report.to_file(output_file='report.html')
+#report=ProfileReport(dados['D'])  
+#report.to_file(output_file='report.html')
 
 '''DUVIDA da erro o primeiro destes 2 comandos - concat() got an unexpected keyword 
 argument 'join_axes' '''
@@ -173,13 +181,22 @@ nwp_grid0 = {
 }
 nwp_grid0['central']=nwp_grid0['central'].assign(producao=dados["D"].iloc[:, 195].values)
 
+#retirar dias sem producao
+from_ts = '2017-01-20 00:00:00'
+to_ts = '2017-02-02 23:00:00'
+nwp_grid0['central'] = nwp_grid0['central'][(nwp_grid0['central'].index < from_ts) | (nwp_grid0['central'].index > to_ts)]
+nwp_grid0['elev_solar'] = nwp_grid0['elev_solar'][(nwp_grid0['elev_solar'].index < from_ts) | (nwp_grid0['elev_solar'].index > to_ts)]
+
+
 i=3
 for a in range(1,7):
     for b in range(1,7):
         cols = [0,1, i, i+1, i+2, i+3, i+4]
         nwp_grid0[str(a)+'x'+str(b)] = dados["D"].iloc[:, cols]
         i=i+5
-        
+        nwp_grid0[str(a)+'x'+str(b)] = nwp_grid0[str(a)+'x'+str(b)][(nwp_grid0[str(a)+'x'+str(b)].index < from_ts) | (nwp_grid0[str(a)+'x'+str(b)].index > to_ts)]
+
+
 
 #D+1
 nwp_grid1 = {
@@ -188,12 +205,20 @@ nwp_grid1 = {
 }
 nwp_grid1['central']=nwp_grid1['central'].assign(producao=dados["D+1"].iloc[:, 195].values)
 
+#retirar dias sem producao
+nwp_grid1['central'] = nwp_grid1['central'][(nwp_grid1['central'].index < from_ts) | (nwp_grid1['central'].index > to_ts)]
+nwp_grid1['elev_solar'] = nwp_grid1['elev_solar'][(nwp_grid1['elev_solar'].index < from_ts) | (nwp_grid1['elev_solar'].index > to_ts)]
+
+
+
 i=3
 for a in range(1,7):
     for b in range(1,7):
         cols = [0,1, i, i+1, i+2, i+3, i+4]
         nwp_grid1[str(a)+'x'+str(b)] = dados["D+1"].iloc[:, cols]
         i=i+5
+        nwp_grid1[str(a)+'x'+str(b)] = nwp_grid1[str(a)+'x'+str(b)][(nwp_grid1[str(a)+'x'+str(b)].index < from_ts) | (nwp_grid1[str(a)+'x'+str(b)].index > to_ts)]
+
 
 
 #D+2
@@ -203,12 +228,20 @@ nwp_grid2 = {
 }
 nwp_grid2['central']=nwp_grid2['central'].assign(producao=dados["D+2"].iloc[:, 195].values)
 
+#retirar dias sem producao
+nwp_grid2['central'] = nwp_grid2['central'][(nwp_grid2['central'].index < from_ts) | (nwp_grid2['central'].index > to_ts)]
+nwp_grid2['elev_solar'] = nwp_grid2['elev_solar'][(nwp_grid2['elev_solar'].index < from_ts) | (nwp_grid2['elev_solar'].index > to_ts)]
+
+
+
 i=3
 for a in range(1,7):
     for b in range(1,7):
         cols = [0,1, i, i+1, i+2, i+3, i+4]
         nwp_grid2[str(a)+'x'+str(b)] = dados["D+2"].iloc[:, cols]
         i=i+5
+        nwp_grid2[str(a)+'x'+str(b)] = nwp_grid2[str(a)+'x'+str(b)][(nwp_grid2[str(a)+'x'+str(b)].index < from_ts) | (nwp_grid2[str(a)+'x'+str(b)].index > to_ts)]
+
 
 
 #D+3
@@ -218,12 +251,22 @@ nwp_grid3 = {
 }
 nwp_grid3['central']=nwp_grid3['central'].assign(producao=dados["D+3"].iloc[:, 195].values)
 
+#retirar dias sem producao
+nwp_grid3['central'] = nwp_grid3['central'][(nwp_grid3['central'].index < from_ts) | (nwp_grid3['central'].index > to_ts)]
+nwp_grid3['elev_solar'] = nwp_grid3['elev_solar'][(nwp_grid3['elev_solar'].index < from_ts) | (nwp_grid3['elev_solar'].index > to_ts)]
+
+
+
 i=3
 for a in range(1,7):
     for b in range(1,7):
         cols = [0,1, i, i+1, i+2, i+3, i+4]
         nwp_grid3[str(a)+'x'+str(b)] = dados["D+3"].iloc[:, cols]
         i=i+5
+        nwp_grid3[str(a)+'x'+str(b)] = nwp_grid3[str(a)+'x'+str(b)][(nwp_grid3[str(a)+'x'+str(b)].index < from_ts) | (nwp_grid3[str(a)+'x'+str(b)].index > to_ts)]
+
+        
+        
         
 nwpgrid = {
         "D": nwp_grid0,
@@ -232,8 +275,65 @@ nwpgrid = {
         "D+3": nwp_grid3
 }
 
-''' DUVIDA: na serie de potencia ha varios dias sem producao - 20/1/2017-3/2/2017
-ignoro estes dados nulos de producao ou tomo alguma medida? '''
+
+#normalizacao dos dados da central
+scaler = MinMaxScaler()
+
+df=nwpgrid['D']['central']
+df.iloc[:,0]=scaler.fit_transform(df.iloc[:,0].values.reshape(-1,1))
+df.iloc[:,2]=scaler.fit_transform(df.iloc[:,2].values.reshape(-1,1))
+df.iloc[:,3]=scaler.fit_transform(df.iloc[:,3].values.reshape(-1,1))
+df.iloc[:,4]=scaler.fit_transform(df.iloc[:,4].values.reshape(-1,1))
+df.iloc[:,10]=scaler.fit_transform(df.iloc[:,10].values.reshape(-1,1))
+nwpgrid['D']['central']=df
+
+df=nwpgrid['D']['elev_solar']
+df=scaler.fit_transform(df.values.reshape(-1,1))
+nwpgrid['D']['elev_solar']=pd.Series(df[:,0], index=nwpgrid['D']['elev_solar'].index)
+
+
+
+
+df=nwpgrid['D+1']['central']
+df.iloc[:,0]=scaler.fit_transform(df.iloc[:,0].values.reshape(-1,1))
+df.iloc[:,2]=scaler.fit_transform(df.iloc[:,2].values.reshape(-1,1))
+df.iloc[:,3]=scaler.fit_transform(df.iloc[:,3].values.reshape(-1,1))
+df.iloc[:,4]=scaler.fit_transform(df.iloc[:,4].values.reshape(-1,1))
+df.iloc[:,10]=scaler.fit_transform(df.iloc[:,10].values.reshape(-1,1))
+nwpgrid['D+1']['central']=df
+
+df=nwpgrid['D+1']['elev_solar']
+df=scaler.fit_transform(df.values.reshape(-1,1))
+nwpgrid['D+1']['elev_solar']=pd.Series(df[:,0], index=nwpgrid['D+1']['elev_solar'].index)
+
+
+
+df=nwpgrid['D+2']['central']
+df.iloc[:,0]=scaler.fit_transform(df.iloc[:,0].values.reshape(-1,1))
+df.iloc[:,2]=scaler.fit_transform(df.iloc[:,2].values.reshape(-1,1))
+df.iloc[:,3]=scaler.fit_transform(df.iloc[:,3].values.reshape(-1,1))
+df.iloc[:,4]=scaler.fit_transform(df.iloc[:,4].values.reshape(-1,1))
+df.iloc[:,10]=scaler.fit_transform(df.iloc[:,10].values.reshape(-1,1))
+nwpgrid['D+2']['central']=df
+
+df=nwpgrid['D+2']['elev_solar']
+df=scaler.fit_transform(df.values.reshape(-1,1))
+nwpgrid['D+2']['elev_solar']=pd.Series(df[:,0], index=nwpgrid['D+2']['elev_solar'].index)
+
+
+
+df=nwpgrid['D+3']['central']
+df.iloc[:,0]=scaler.fit_transform(df.iloc[:,0].values.reshape(-1,1))
+df.iloc[:,2]=scaler.fit_transform(df.iloc[:,2].values.reshape(-1,1))
+df.iloc[:,3]=scaler.fit_transform(df.iloc[:,3].values.reshape(-1,1))
+df.iloc[:,4]=scaler.fit_transform(df.iloc[:,4].values.reshape(-1,1))
+df.iloc[:,10]=scaler.fit_transform(df.iloc[:,10].values.reshape(-1,1))
+nwpgrid['D+3']['central']=df
+
+df=nwpgrid['D+3']['elev_solar']
+df=scaler.fit_transform(df.values.reshape(-1,1))
+nwpgrid['D+3']['elev_solar']=pd.Series(df[:,0], index=nwpgrid['D+3']['elev_solar'].index)
+
 
 
 #localizacao dos pontos da grid________________________________________________
@@ -276,7 +376,7 @@ time = df.index
 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
 df=df.assign(csm_ghi=cs['ghi'].values)
 df=df.assign(irr_norm=df['csm_ghi'].values)
-df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[1]]/df[df.columns[12]], df['irr_norm'])  
+df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[1]]+10)/(df[df.columns[12]]+10), df['irr_norm'])  
 nwpgrid['D']['central']=df 
   
 
@@ -285,15 +385,16 @@ time = df.index
 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
 df=df.assign(csm_ghi=cs['ghi'].values)
 df=df.assign(irr_norm=df['csm_ghi'].values)
-df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[1]]/df[df.columns[12]], df['irr_norm'])  
+df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[1]]+10)/(df[df.columns[12]]+10), df['irr_norm'])  
 nwpgrid['D+1']['central']=df 
   
+
 df=nwpgrid['D+2']['central'] 
 time = df.index
 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
 df=df.assign(csm_ghi=cs['ghi'].values)
 df=df.assign(irr_norm=df['csm_ghi'].values)
-df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[1]]/df[df.columns[12]], df['irr_norm'])  
+df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[1]]+10)/(df[df.columns[12]]+10), df['irr_norm'])  
 nwpgrid['D+2']['central']=df         
   
   
@@ -302,7 +403,7 @@ time = df.index
 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
 df=df.assign(csm_ghi=cs['ghi'].values)
 df=df.assign(irr_norm=df['csm_ghi'].values)
-df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[1]]/df[df.columns[12]], df['irr_norm'])  
+df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[1]]+50)/(df[df.columns[12]]+50), df['irr_norm'])  
 nwpgrid['D+3']['central']=df 
               
         
@@ -318,7 +419,7 @@ for dia in range(0,4):
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
                 df=df.assign(csm_ghi=cs['ghi'].values)
                 df=df.assign(irr_norm=df['csm_ghi'].values)
-                df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[2]]/df[df.columns[7]], df['irr_norm'])  
+                df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[2]]+10)/(df[df.columns[7]]+10), df['irr_norm'])  
                 nwpgrid['D'][str(a)+'x'+str(b)]=df 
                 
             elif dia==1:
@@ -327,7 +428,7 @@ for dia in range(0,4):
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
                 df=df.assign(csm_ghi=cs['ghi'].values)
                 df=df.assign(irr_norm=df['csm_ghi'].values)
-                df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[2]]/df[df.columns[7]], df['irr_norm'])  
+                df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[2]]+10)/(df[df.columns[7]]+10), df['irr_norm'])  
                 nwpgrid['D+1'][str(a)+'x'+str(b)]=df 
                 
             elif dia==2:
@@ -336,7 +437,7 @@ for dia in range(0,4):
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
                 df=df.assign(csm_ghi=cs['ghi'].values)
                 df=df.assign(irr_norm=df['csm_ghi'].values)
-                df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[2]]/df[df.columns[7]], df['irr_norm'])  
+                df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[2]]+10)/(df[df.columns[7]]+10), df['irr_norm'])  
                 nwpgrid['D+2'][str(a)+'x'+str(b)]=df 
             
             elif dia==3:
@@ -345,11 +446,9 @@ for dia in range(0,4):
                 cs = local.get_clearsky(time)  # df com ghi, dni, dhi
                 df=df.assign(csm_ghi=cs['ghi'].values)
                 df=df.assign(irr_norm=df['csm_ghi'].values)
-                df['irr_norm'] = np.where(df['irr_norm']>0, df[df.columns[2]]/df[df.columns[7]], df['irr_norm'])  
+                df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[2]]+10)/(df[df.columns[7]]+10), df['irr_norm'])  
                 nwpgrid['D+3'][str(a)+'x'+str(b)]=df 
         
-''' DUVIDA: valores de irradiancia normalizada anormalmente altos atingindo valores
-de 5 - normalmente ocorrem para a primeira hora do dia em que o valor deixa de ser 0'''
     
 '''teste do csm num ponto aleatorio da grid -> OK!
 local = Location(location[6,6,0], location[6,6,1])
@@ -417,39 +516,34 @@ nwpgrid['D+3']['central']=df
 #D
 df=nwpgrid['D']['central']
 df=df.assign(pot_norm=df['Pcs'].values)
-df['pot_norm']=np.where(df['pot_norm']>0, df[df.columns[11]]/df[df.columns[14]], df['pot_norm']) #11=pot e 14=Pcs   
+df['pot_norm']=np.where(df['pot_norm']>0, (df[df.columns[11]]+1)/(df[df.columns[14]]+1), df['pot_norm']) #11=pot e 14=Pcs   
 nwpgrid['D']['central']=df 
     
 #D+1
 df=nwpgrid['D+1']['central']
 df=df.assign(pot_norm=df['Pcs'].values)
-df['pot_norm']=np.where(df['pot_norm']>0, df[df.columns[11]]/df[df.columns[14]], df['pot_norm']) #11=pot e 14=Pcs   
+df['pot_norm']=np.where(df['pot_norm']>0, (df[df.columns[11]]+1)/(df[df.columns[14]]+1), df['pot_norm']) #11=pot e 14=Pcs   
 nwpgrid['D+1']['central']=df 
 
 #D+2
 df=nwpgrid['D+2']['central']
 df=df.assign(pot_norm =df['Pcs'].values)
-df['pot_norm']=np.where(df['pot_norm']>0, df[df.columns[11]]/df[df.columns[14]], df['pot_norm']) #11=pot e 14=Pcs   
+df['pot_norm']=np.where(df['pot_norm']>0, (df[df.columns[11]]+1)/(df[df.columns[14]]+1), df['pot_norm']) #11=pot e 14=Pcs   
 nwpgrid['D+2']['central']=df 
 
 #D+3
 df=nwpgrid['D+3']['central']
 df=df.assign(pot_norm =df['Pcs'].values)
-df['pot_norm']=np.where(df['pot_norm']>0, df[df.columns[11]]/df[df.columns[14]], df['pot_norm']) #11=pot e 14=Pcs   
+df['pot_norm']=np.where(df['pot_norm']>0, (df[df.columns[11]]+1)/(df[df.columns[14]]+1), df['pot_norm']) #11=pot e 14=Pcs   
 nwpgrid['D+3']['central']=df 
 
 
-'''DUVIDA: valores de potencia normalizada apresenta valores anormalmente altos 
-chegando a valores de 11 e 12 - normalmente ocorrem para a primeira hora do dia 
-em que o valor deixa de ser 0 '''
 
 
 
 
 
 #Apenas dia D _________________________________________________________________
-'''DUVIDA: calculo da variancia temporal e dos lags - aplicar a irradiancia observada ou 
-a normalizada (que ja foi calculada) ou as duas? '''
 
 
 
@@ -462,11 +556,6 @@ df=nwpgrid['D']['central']
 df=df.assign(temp_var3=df[df.columns[0]].rolling(window=3, center=True).var())
 df=df.assign(temp_var7=df[df.columns[0]].rolling(window=7, center=True).var())
 df=df.assign(temp_var11=df[df.columns[0]].rolling(window=11, center=True).var())
-
-#irradiancia
-df=df.assign(irr_var3=df[df.columns[1]].rolling(window=3, center=True).var())
-df=df.assign(irr_var7=df[df.columns[1]].rolling(window=7, center=True).var())
-df=df.assign(irr_var11=df[df.columns[1]].rolling(window=11, center=True).var())
 
 #pressao
 df=df.assign(pres_var3=df[df.columns[2]].rolling(window=3, center=True).var())
@@ -529,11 +618,6 @@ for a in range(1,7):
     
     df=nwpgrid['D'][str(a)+'x'+str(b)]
     
-    #irradiancia
-    df=df.assign(irr_var3=df[df.columns[2]].rolling(window=3, center=True).var())
-    df=df.assign(irr_var7=df[df.columns[2]].rolling(window=7, center=True).var())
-    df=df.assign(irr_var11=df[df.columns[2]].rolling(window=11, center=True).var())
-    
     #frac. total
     df=df.assign(ftotal_var3=df[df.columns[3]].rolling(window=3, center=True).var())
     df=df.assign(ftotal_var7=df[df.columns[3]].rolling(window=7, center=True).var())
@@ -572,11 +656,6 @@ df=nwpgrid['D']['central']
 df=df.assign(temp_lag1=df[df.columns[0]].shift(periods=1))
 df=df.assign(temp_lag2=df[df.columns[0]].shift(periods=2))
 df=df.assign(temp_lag3=df[df.columns[0]].shift(periods=3))
-
-#irradiancia
-df=df.assign(irr_lag1=df[df.columns[1]].shift(periods=1))
-df=df.assign(irr_lag2=df[df.columns[1]].shift(periods=2))
-df=df.assign(irr_lag3=df[df.columns[1]].shift(periods=3))
 
 #pressao
 df=df.assign(pres_lag1=df[df.columns[2]].shift(periods=1))
@@ -637,11 +716,6 @@ for a in range(1,7):
     
     df=nwpgrid['D'][str(a)+'x'+str(b)]
     
-    #irradiancia
-    df=df.assign(irr_lag1=df[df.columns[2]].shift(periods=1))
-    df=df.assign(irr_lag2=df[df.columns[2]].shift(periods=2))
-    df=df.assign(irr_lag3=df[df.columns[2]].shift(periods=3))
-    
     ##frac. total
     df=df.assign(ftotal_lag1=df[df.columns[3]].shift(periods=1))
     df=df.assign(ftotal_lag2=df[df.columns[3]].shift(periods=2))
@@ -677,7 +751,7 @@ for a in range(1,7):
 
 
 #para ter o index sincronizado
-df=pd.concat([nwpgrid['D']['1x1'], nwpgrid['D+1']['1x1'], nwpgrid['D+2']['1x1'], nwpgrid['D+3']['1x1']], axis=1, sort=False)
+df=pd.concat([nwpgrid['D']['1x1'], nwpgrid['D+1']['1x1'], nwpgrid['D+2']['1x1'], nwpgrid['D+3']['1x1']], axis=1, sort=True)
 
 #criar df media para central e cada pto da grid
 cols=['temperatura', 'irr_norm', 'pressao', 'velocidade', 'direcao', 'hum. relativa',
@@ -694,50 +768,50 @@ for a in range(1,7):
         media[str(a)+'x'+str(b)] = pd.DataFrame(index=[df.index], columns=cols)
         media[str(a)+'x'+str(b)].set_index(df.index, inplace = True)
         
-'''aux=pd.DataFrame({'A': [0,1,2,3],
-                  'B': [2,3,4,5]})
-aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())  exemplo simplificado p/ duvida '''
 
 #media dos pts da grid
         
-#irradiancia
+#irradiancia normalizada
 for a in range(1,7):
   for b in range(1,7):
     df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
     aux=df.filter(like='irr_norm', axis=1)
-    aux=aux.assign(media=aux.mean(axis=1))
+    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
     media[str(a)+'x'+str(b)]['irr_norm'] = aux['media']
    
 #frac. total
 for a in range(1,7):
   for b in range(1,7):
     df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='frac. total', axis=1)
-    media[str(a)+'x'+str(b)]['frac. total'] = aux.ewm(span=4).mean(axis=1)     
+    aux=df.filter(like='Fraccion total', axis=1)
+    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
+    media[str(a)+'x'+str(b)]['frac. total'] = aux['media']     
     
 #frac. baixa
 for a in range(1,7):
   for b in range(1,7):
     df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='frac. baixa', axis=1)
-    media[str(a)+'x'+str(b)]['frac. baixa'] = aux.ewm(span=4).mean(axis=1)   
+    aux=df.filter(like='Frac. Baja', axis=1)
+    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
+    media[str(a)+'x'+str(b)]['frac. baixa'] = aux['media']    
     
 #frac. media
 for a in range(1,7):
   for b in range(1,7):
     df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='frac. media', axis=1)
-    media[str(a)+'x'+str(b)]['frac. media'] = aux.ewm(span=4).mean(axis=1)
+    aux=df.filter(like='Frac. Media', axis=1)
+    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
+    media[str(a)+'x'+str(b)]['frac. media'] = aux['media'] 
 
 #frac. alta
 for a in range(1,7):
   for b in range(1,7):
     df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='frac. alta', axis=1)
-    media[str(a)+'x'+str(b)]['frac. alta'] = aux.ewm(span=4).mean(axis=1)
+    aux=df.filter(like='Frac. Alta', axis=1)
+    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
+    media[str(a)+'x'+str(b)]['frac. alta'] = aux['media'] 
     
-'''DUVIDA: aplicar o comando da media pesada sem erros. como aplicar o comando 
-.ewm(span=4).mean() sem erro. '''
+
     
     
     
@@ -746,80 +820,69 @@ df=pd.concat([nwpgrid['D']['central'], nwpgrid['D+1']['central'], nwpgrid['D+2']
 
 #temperatura
 aux=df.filter(like='Temperatura', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.mean(axis=1)) #com .mean() funciona
 media['central']['temperatura'] = aux['media']
 
 #pressao
-aux=df.filter(like='Presión', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=df.filter(like='Presión', axis=1) 
+aux=aux.assign(media=aux.ewm(span=4).mean()) #erro
 media['central']['pressao'] = aux['media']
 
 #velocidade
 aux=df.filter(like='Velocidad', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['velocidade'] = aux['media']
    
 #velocidade
 aux=df.filter(like='Dirección', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['direcao'] = aux['media']
 
 #humidade relativa
 aux=df.filter(like='Humedad rel', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['hum. relativa'] = aux['media']
 
 #frac. total
 aux=df.filter(like='Fraccion total.36', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['frac. total'] = aux['media']    
     
 #frac. baixa
 aux=df.filter(like='Frac. Baja.36', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['frac. baixa'] = aux['media']     
     
 #frac. media
 aux=df.filter(like='Frac. Media.36', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['frac. media'] = aux['media']    
 
 #frac. alta
 aux=df.filter(like='Frac. Alta.36', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['frac. alta'] = aux['media']    
 
 #precipitacao
 aux=df.filter(like='Precipitación', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['precipitacao'] = aux['media']
 
-#irradiancia
+#irradiancia normalizada
 aux=df.filter(like='irr_norm', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
+aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
 media['central']['irr_norm'] = aux['media']
 
-#producao
-aux=df.filter(like='pot_norm', axis=1)
-aux=aux.assign(media=aux.mean(axis=1))
-media['central']['pot_norm'] = aux['media']
+
+
+
 
 
 #PCA __________________________________________________________________________
 
 '''indicacao paper: melhores resultados obtidos para PCA aplicado individualmente
-a cada serie de dados de cada ponto da grid
+a cada serie de dados de cada ponto da grid - tambem inclui o da central'''
 
-DUVIDA: segundo o paper so se aplica aos pontos da grid - incluir os da central?
-
-DUVIDA: o pca usa-se sobre os dados observados ou sobre as medias calculadas acima?
-
-DUVIDA: ao aplicar o pca no dia D, usar apenas as variaveis observadas como nos outros
-dias ou usar tambem as variancias temporais e lags? se for para os incluir tenho de retirar
-nan provenientes da sincronizacao - coloco esses valores a zero?
-
-DUVIDA: eu nao inclui a producao no pca por ser o target e por ser apenas uma coluna. 
-esta correto?'''
 
 prin_comp95 = {
     'D': {},
@@ -828,7 +891,7 @@ prin_comp95 = {
     'D+3': {}
 }
 
-prin_comp90 = {
+prin_comp89 = {
     'D': {},
     'D+1': {},
     'D+2': {},
@@ -836,18 +899,21 @@ prin_comp90 = {
 }
 
 
-#D central
+#D central 
 cols = [0,2,3,4,5,6,7,8,9,10,13]
 df=nwpgrid['D']['central'].iloc[:, cols]
+df=df.assign(elev_solar=nwpgrid['D']['elev_solar'])
+df.set_index(nwpgrid['D']['central'].index, inplace = True)
+
 
 pca = PCA(.95) #numero componentes que prefazem 95%
 pca.fit(df)
 prin_comp95['D']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
 
-pca = PCA(.90) #numero componentes que prefazem 90%
+
+pca = PCA(.89) #numero componentes que prefazem 89%
 pca.fit(df)
-prin_comp90['D']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
-  
+prin_comp89['D']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
 
 #D grid
 cols = [3,4,5,6,8] 
@@ -859,13 +925,14 @@ for a in range(1,7):
       pca.fit(df)
       prin_comp95['D'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
       
-      pca = PCA(.90) #numero componentes que prefazem 90%
+      pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
-      prin_comp90['D'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+      prin_comp89['D'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
 
 #D producao
 df=nwpgrid['D']['central']['pot_norm']
-prin_comp90['D']['producao']=pd.DataFrame(data=df, index=df.index)
+prin_comp89['D']['producao']=pd.DataFrame(data=df, index=df.index)
 
 prin_comp95['D']['producao']=pd.DataFrame(data=df, index=df.index)
 
@@ -875,15 +942,17 @@ prin_comp95['D']['producao']=pd.DataFrame(data=df, index=df.index)
 #D+1 central
 cols = [0,2,3,4,5,6,7,8,9,10,13] 
 df=nwpgrid['D+1']['central'].iloc[:, cols]
+df=df.assign(elev_solar=nwpgrid['D+1']['elev_solar'])
 df.set_index(nwpgrid['D+1']['central'].index, inplace = True)
+
 
 pca = PCA(.95) #numero componentes que prefazem 95%
 pca.fit(df)
 prin_comp95['D+1']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
 
-pca = PCA(.90) #numero componentes que prefazem 90%
+pca = PCA(.89) #numero componentes que prefazem 89%
 pca.fit(df)
-prin_comp90['D+1']['central']=pd.DataFrame(data=pca.transform(df), index=df.index) 
+prin_comp89['D+1']['central']=pd.DataFrame(data=pca.transform(df), index=df.index) 
 
 
 #D+1 grid                 
@@ -897,13 +966,13 @@ for a in range(1,7):
       pca.fit(df)
       prin_comp95['D+1'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
       
-      pca = PCA(.90) #numero componentes que prefazem 90%
+      pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
-      prin_comp90['D+1'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+      prin_comp89['D+1'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
 
 #D+1 producao
 df=nwpgrid['D+1']['central']['pot_norm']
-prin_comp90['D+1']['producao']=pd.DataFrame(data=df, index=df.index)
+prin_comp89['D+1']['producao']=pd.DataFrame(data=df, index=df.index)
 
 prin_comp95['D+1']['producao']=pd.DataFrame(data=df, index=df.index)
 
@@ -913,15 +982,17 @@ prin_comp95['D+1']['producao']=pd.DataFrame(data=df, index=df.index)
 #D+2 central
 cols = [0,2,3,4,5,6,7,8,9,10,13]
 df=nwpgrid['D+2']['central'].iloc[:, cols]
+df=df.assign(elev_solar=nwpgrid['D+2']['elev_solar'])
 df.set_index(nwpgrid['D+2']['central'].index, inplace = True)
+
 
 pca = PCA(.95) #numero componentes que prefazem 95%
 pca.fit(df)
 prin_comp95['D+2']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
 
-pca = PCA(.90) #numero componentes que prefazem 90%
+pca = PCA(.89) #numero componentes que prefazem 89%
 pca.fit(df)
-prin_comp90['D+2']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)  
+prin_comp89['D+2']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)  
       
       
 #D+2 grid
@@ -935,13 +1006,13 @@ for a in range(1,7):
       pca.fit(df)
       prin_comp95['D+2'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
       
-      pca = PCA(.90) #numero componentes que prefazem 90%
+      pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
-      prin_comp90['D+2'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+      prin_comp89['D+2'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
 
 #D+2 producao
 df=nwpgrid['D+2']['central']['pot_norm']
-prin_comp90['D+2']['producao']=pd.DataFrame(data=df, index=df.index)
+prin_comp89['D+2']['producao']=pd.DataFrame(data=df, index=df.index)
 
 prin_comp95['D+2']['producao']=pd.DataFrame(data=df, index=df.index)
 
@@ -950,15 +1021,17 @@ prin_comp95['D+2']['producao']=pd.DataFrame(data=df, index=df.index)
 #D+3 central
 cols = [0,2,3,4,5,6,7,8,9,10,13]
 df=nwpgrid['D+3']['central'].iloc[:, cols]
+df=df.assign(elev_solar=nwpgrid['D+3']['elev_solar'])
 df.set_index(nwpgrid['D+3']['central'].index, inplace = True)
+
 
 pca = PCA(.95) #numero componentes que prefazem 95%
 pca.fit(df)
 prin_comp95['D+3']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
 
-pca = PCA(.90) #numero componentes que prefazem 90%
+pca = PCA(.89) #numero componentes que prefazem 89%
 pca.fit(df)
-prin_comp90['D+3']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)      
+prin_comp89['D+3']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)      
       
 #D+3 grid
 cols = [3,4,5,6,8] #colunas das variaveis 
@@ -972,14 +1045,14 @@ for a in range(1,7):
       pca.fit(df)
       prin_comp95['D+3'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
       
-      pca = PCA(.90) #numero componentes que prefazem 90%
+      pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
-      prin_comp90['D+3'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+      prin_comp89['D+3'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
 
 
 #D+3 producao
 df=nwpgrid['D+3']['central']['pot_norm']
-prin_comp90['D+3']['producao']=pd.DataFrame(data=df, index=df.index)
+prin_comp89['D+3']['producao']=pd.DataFrame(data=df, index=df.index)
 
 prin_comp95['D+3']['producao']=pd.DataFrame(data=df, index=df.index)
 
@@ -1001,85 +1074,234 @@ prin_comp95['D+3']['producao']=pd.DataFrame(data=df, index=df.index)
 #principal components em todos os pontos - X
 #potencia produzida D+1 - Y
 
-'''DUVIDA: abaixo passo os dados provenientes do pca para uma df a parte para servir
-de X_train. a sincronizacao dos dados cria nan - coloco-os a zero? '''
 
 #TREINO
+d0=0 #numero colunas dia 0
+d1=0 #numero colunas dia 1
+d2=0 #numero colunas dia 2
+d3=0 #numero colunas dia 3
+
 df=pd.DataFrame()
 for a in range(1,7):
     for b in range(1,7):
-      df=pd.concat([df, prin_comp90['D'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
-for a in range(1,7):
-    for b in range(1,7):
-      df=pd.concat([df, prin_comp90['D+1'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
-      
-for a in range(1,7):
-    for b in range(1,7):
-      df=pd.concat([df, prin_comp90['D+2'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
-      
-for a in range(1,7):
-    for b in range(1,7):
-      df=pd.concat([df, prin_comp90['D+3'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
-      
-      
-x_train=df #ainda tem nans - preciso tirar - por zero?
+      df=pd.concat([df, prin_comp89['D'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+      d0+=prin_comp89['D'][str(a)+'x'+str(b)].shape[1]
 
-y_train = prin_comp90['D+1']['producao'].loc['2017-01-01':'2019/12/31']
+d1+=d0      
+for a in range(1,7):
+    for b in range(1,7):
+      df=pd.concat([df, prin_comp89['D+1'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+      d1+=prin_comp89['D+1'][str(a)+'x'+str(b)].shape[1]
+      
+d2+=d1  
+for a in range(1,7):
+    for b in range(1,7):
+      df=pd.concat([df, prin_comp89['D+2'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+      d2+=prin_comp89['D+2'][str(a)+'x'+str(b)].shape[1]
+      
+d3+=d2   
+for a in range(1,7):
+    for b in range(1,7):
+      df=pd.concat([df, prin_comp89['D+3'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
+      d3+=prin_comp89['D+3'][str(a)+'x'+str(b)].shape[1]
+      
+df.columns = range(df.shape[1])      
+x_train=df 
 
-'''DUVIDA: y_train e apenas a potencia no dia D+1 uma vez que a nossa intencao e prever 
-apenas o dia D+1, certo? '''
+
+
+
+#Retirar nan das 00:00:00 horas do dia D
+#media de toda a df preenchida com o elemento anterior com toda a df preenchida com o elemento seguinte - valores nan dao a media dos 2 e os outros mantem-se
+x_train.iloc[:,0:d0] = (x_train.iloc[:,0:d0].ffill()+x_train.iloc[:,0:d0].bfill())/2
+
+#Retirar nan do dia 1-1-2017 na previsao D+1
+#colocar igual a previsao imediatamente a seguir 
+x_train.iloc[0:23,d0:d1] = x_train.iloc[24:47,d0:d1].values
+
+#Retirar nan dos dias 1-1-2017 e 2-1-2017 na previsao D+2
+#colocar igual a previsao imediatamente a seguir 
+x_train.iloc[23:47,d1:d2] = x_train.iloc[47:71,d1:d2].values
+x_train.iloc[0:23,d1:d2] = x_train.iloc[48:71,d1:d2].values
+
+#Retirar nan dos dias 1-1-2017, 2-1-2017 e 3-1-2017 na previsao D+3
+#colocar igual a previsao imediatamente a seguir 
+x_train.iloc[47:71,d2:d3] = x_train.iloc[71:95,d2:d3].values
+x_train.iloc[23:47,d2:d3] = x_train.iloc[71:95,d2:d3].values
+x_train.iloc[0:23,d2:d3] = x_train.iloc[72:95,d2:d3].values
+
+
+
+
+
+
+#tirar a x_train os dias que faltam a y_train para ficar sincrono
+x_train=pd.concat([x_train.loc['2017-01-02':'2019-02-27'], x_train.loc['2019-03-03':'2019-04-05'], x_train.loc['2019-04-09':'2019/12/31']])
+
+#x_train.isnull().sum().sum()
+''' onde estao os nulls
+df_null = x_test.isnull().unstack()
+t = df_null[df_null]'''
+
+
+y_train = prin_comp89['D+1']['producao'].loc['2017-01-01':'2019/12/31']
+y_train=pd.concat([y_train.loc['2017-01-02':'2019-02-27'], y_train.loc['2019-03-03':'2019-04-05'], y_train.loc['2019-04-09':'2019/12/31']])
+
+#y_train.isnull().sum().sum()
+
+'''Detetar diferencas entre x_train e y_train
+y=np.where(x_train.index.isin(y_train.index) == False)'''
+
+
 
 #TESTE
 
 df=pd.DataFrame()
 for a in range(1,7):
     for b in range(1,7):
-      df=pd.concat([df, prin_comp90['D'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+      df=pd.concat([df, prin_comp89['D'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
 for a in range(1,7):
     for b in range(1,7):
-      df=pd.concat([df, prin_comp90['D+1'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
-      
-for a in range(1,7):
-    for b in range(1,7):
-      df=pd.concat([df, prin_comp90['D+2'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+      df=pd.concat([df, prin_comp89['D+1'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
       
 for a in range(1,7):
     for b in range(1,7):
-      df=pd.concat([df, prin_comp90['D+3'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+      df=pd.concat([df, prin_comp89['D+2'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
       
+for a in range(1,7):
+    for b in range(1,7):
+      df=pd.concat([df, prin_comp89['D+3'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
       
-x_test=df #ainda tem nans - preciso tirar - por zero?
+df.columns = range(df.shape[1])            
+x_test=df 
 
-y_test = prin_comp90['D+1']['producao'].loc['2020-01-01':'2020/05/31']
+
+
+
+
+#Retirar nan das 00:00:00 horas do dia D
+#media de toda a df preenchida com o elemento anterior com toda a df preenchida com o elemento seguinte - valores nan dao a media dos 2 e os outros mantem-se
+x_test.iloc[:,0:d0] = (x_test.iloc[:,0:d0].ffill()+x_test.iloc[:,0:d0].bfill())/2
+
+#dia 31/05/2020 da previsao D
+x_test.iloc[-24:,0:d0] = x_test.iloc[-48:-24,0:d0].values
+
+#primeiro dia as 00:00:00 igual a 01:00:00 desse dia
+x_test.iloc[:,0:d0] = x_test.iloc[:,0:d0].bfill()
+
+#x_test.isnull().sum().sum()
+
+''' onde estao os nulls
+df_null = x_test.isnull().unstack()
+t = df_null[df_null]'''
+
+
+
+
+
+y_test = prin_comp89['D+1']['producao'].loc['2020-01-01':'2020/05/31']
+#y_test.isnull().sum().sum()
+
+#y_test.isnull().sum().sum()
 
       
-      
-#GBT___________________________________________________________________________
 
-      
-      
-      
-      
-      
-      
-
+########################### EM DESENVOLVIMENTO ################################
 
 #XGBoost_______________________________________________________________________
-      
-      
+
+train=xgb.DMatrix(x_train, label=y_train) #tutoriais dizem para fazer isto - ver porque
+test=xgb.DMatrix(x_test, label=y_test)
+
+
+params = {'max_depth': 5, #entre 5 e 9
+          'min_child_weight': 20, #entre 20 e 80
+          'eta': 0.05, #entre 0.01 e 0.05 
+          'subsample': 0.8 #80%
+          }   
+epochs=10
+
+#parametros nao estao ajustdos por mim
+xg_reg = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 5, alpha = 10, n_estimators = 10)
+
+model=xg_reg.fit(x_train.values,y_train.values)
+
+y_pred = model.predict(x_test.values)    
     
-    
-    
-    
-    
-    
+xg_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+print("RMSE: %f" % (xg_rmse))    
+
+xg_mae=mean_absolute_error(y_test, y_pred)      
+print("MAE: %f" % (xg_mae))    
+          
+
+
+#GBT___________________________________________________________________________
+
+#definir hyperparameters que fala no paper
+params = {'max_depth': 5, #entre 5 e 9
+          'min_samples_split': 150, #entre 150 e 350
+          'min_samples_leaf': 20, #entre 20 e 80
+          'max_features': 'sqrt', #square root of total number of features
+          'learning_rate': 0.05, #entre 0.01 e 0.05 
+          'n_estimators': 500, #entre 500 e 800 
+          'subsample': 0.8 #80%
+          }
+
+#criar regressor
+reg = GradientBoostingRegressor(**params)
+#treinar modelo
+model=reg.fit(x_train, y_train.values.ravel())
+#prever resposta ao dataset de teste
+y_pred=model.predict(x_test)
+
+
+'''DUVIDA: y_pred da valores negativos '''
+
+gbt_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+print("RMSE: %f" % (gbt_rmse))   
+
+gbt_mae=mean_absolute_error(y_test, y_pred)      
+print("MAE: %f" % (gbt_mae)) 
+
+#Hyperparameters tunning
+'''
+params = {'max_depth': np.arange(5,9,2), #entre 5 e 9
+          'min_samples_split': np.arange(150,350,100), #entre 150 e 350
+          'min_samples_leaf': np.arange(20,80,30), #entre 20 e 80
+          'learning_rate': np.arange(0.01,0.05,0.01), #entre 0.01 e 0.05 
+          'n_estimators': np.arange(500,800,100) #entre 500 e 800 
+          }
+'''
+
+params = {'max_depth':[5,9], #entre 5 e 9
+          'min_samples_split':[150,350], #entre 150 e 350
+          'min_samples_leaf': [20,80], #entre 20 e 80
+          'learning_rate': [0.01,0.05], #entre 0.01 e 0.05 
+          'n_estimators': [500,800] #entre 500 e 800 
+          }
+tuning = GridSearchCV(estimator = GradientBoostingRegressor(max_features='sqrt',subsample=0.8), param_grid=params, scoring='r2')
+tuning.fit(x_train, y_train.values.ravel()) #muito lento - nao consegui ainda obter resultados
+tuning.best_params_, tuning.best_score_  
+
+
+
+
     
 #CatBoost______________________________________________________________________
       
+# Initialize CatBoostRegressor
+cb_reg = CatBoostRegressor(iterations=2, learning_rate=1, depth=2)
+# Fit model
+model=cb_reg.fit(x_train.values, y_train.values)
+# Get predictions
+y_pred = model.predict(x_test.values)
+    
+cb_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+print("RMSE: %f" % (cb_rmse))
 
-    
-    
-    
+cb_mae=mean_absolute_error(y_test, y_pred)      
+print("MAE: %f" % (cb_mae))    
     
     
     
