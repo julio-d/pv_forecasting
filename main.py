@@ -550,64 +550,70 @@ nwpgrid['D+3']['central']=df
 #variancia temporal -> apliquei a todas as variaveis
 
 #central
-df=nwpgrid['D']['central']
+df=pd.DataFrame()
+aux=nwpgrid['D']['central']
     
 #temperatura
-df=df.assign(temp_var3=df[df.columns[0]].rolling(window=3, center=True).var())
-df=df.assign(temp_var7=df[df.columns[0]].rolling(window=7, center=True).var())
-df=df.assign(temp_var11=df[df.columns[0]].rolling(window=11, center=True).var())
+df=df.assign(temp_var3=aux[aux.columns[0]].rolling(window=3, center=True).var())
+df=df.assign(temp_var7=aux[aux.columns[0]].rolling(window=7, center=True).var())
+df=df.assign(temp_var11=aux[aux.columns[0]].rolling(window=11, center=True).var())
 
 #pressao
-df=df.assign(pres_var3=df[df.columns[2]].rolling(window=3, center=True).var())
-df=df.assign(pres_var7=df[df.columns[2]].rolling(window=7, center=True).var())
-df=df.assign(pres_var11=df[df.columns[2]].rolling(window=11, center=True).var())
+df=df.assign(pres_var3=aux[aux.columns[2]].rolling(window=3, center=True).var())
+df=df.assign(pres_var7=aux[aux.columns[2]].rolling(window=7, center=True).var())
+df=df.assign(pres_var11=aux[aux.columns[2]].rolling(window=11, center=True).var())
 
 #velociade vento
-df=df.assign(vel_var3=df[df.columns[3]].rolling(window=3, center=True).var())
-df=df.assign(vel_var7=df[df.columns[3]].rolling(window=7, center=True).var())
-df=df.assign(vel_var11=df[df.columns[3]].rolling(window=11, center=True).var())
+df=df.assign(vel_var3=aux[aux.columns[3]].rolling(window=3, center=True).var())
+df=df.assign(vel_var7=aux[aux.columns[3]].rolling(window=7, center=True).var())
+df=df.assign(vel_var11=aux[aux.columns[3]].rolling(window=11, center=True).var())
 
 #direcao vento
-df=df.assign(dir_var3=df[df.columns[4]].rolling(window=3, center=True).var())
-df=df.assign(dir_var7=df[df.columns[4]].rolling(window=7, center=True).var())
-df=df.assign(dir_var11=df[df.columns[4]].rolling(window=11, center=True).var())
+df=df.assign(dir_var3=aux[aux.columns[4]].rolling(window=3, center=True).var())
+df=df.assign(dir_var7=aux[aux.columns[4]].rolling(window=7, center=True).var())
+df=df.assign(dir_var11=aux[aux.columns[4]].rolling(window=11, center=True).var())
 
 #humidade relativa
-df=df.assign(humr_var3=df[df.columns[5]].rolling(window=3, center=True).var())
-df=df.assign(humr_var7=df[df.columns[5]].rolling(window=7, center=True).var())
-df=df.assign(humr_var11=df[df.columns[5]].rolling(window=11, center=True).var())
+df=df.assign(humr_var3=aux[aux.columns[5]].rolling(window=3, center=True).var())
+df=df.assign(humr_var7=aux[aux.columns[5]].rolling(window=7, center=True).var())
+df=df.assign(humr_var11=aux[aux.columns[5]].rolling(window=11, center=True).var())
 
 #frac total
-df=df.assign(ftotal_var3=df[df.columns[6]].rolling(window=3, center=True).var())
-df=df.assign(ftotal_var7=df[df.columns[6]].rolling(window=7, center=True).var())
-df=df.assign(ftotal_var11=df[df.columns[6]].rolling(window=11, center=True).var())
+df=df.assign(ftotal_var3=aux[aux.columns[6]].rolling(window=3, center=True).var())
+df=df.assign(ftotal_var7=aux[aux.columns[6]].rolling(window=7, center=True).var())
+df=df.assign(ftotal_var11=aux[aux.columns[6]].rolling(window=11, center=True).var())
 
 #frac baixa
-df=df.assign(fbaixa_var3=df[df.columns[7]].rolling(window=3, center=True).var())
-df=df.assign(fbaixa_var7=df[df.columns[7]].rolling(window=7, center=True).var())
-df=df.assign(fbaixa_var11=df[df.columns[7]].rolling(window=11, center=True).var())
+df=df.assign(fbaixa_var3=aux[aux.columns[7]].rolling(window=3, center=True).var())
+df=df.assign(fbaixa_var7=aux[aux.columns[7]].rolling(window=7, center=True).var())
+df=df.assign(fbaixa_var11=aux[aux.columns[7]].rolling(window=11, center=True).var())
 
 #frac media
-df=df.assign(fmedia_var3=df[df.columns[8]].rolling(window=3, center=True).var())
-df=df.assign(fmedia_var7=df[df.columns[8]].rolling(window=7, center=True).var())
-df=df.assign(fmedia_var11=df[df.columns[8]].rolling(window=11, center=True).var())
+df=df.assign(fmedia_var3=aux[aux.columns[8]].rolling(window=3, center=True).var())
+df=df.assign(fmedia_var7=aux[aux.columns[8]].rolling(window=7, center=True).var())
+df=df.assign(fmedia_var11=aux[aux.columns[8]].rolling(window=11, center=True).var())
 
 #frac alta
-df=df.assign(falta_var3=df[df.columns[9]].rolling(window=3, center=True).var())
-df=df.assign(falta_var7=df[df.columns[9]].rolling(window=7, center=True).var())
-df=df.assign(falta_var11=df[df.columns[9]].rolling(window=11, center=True).var())
+df=df.assign(falta_var3=aux[aux.columns[9]].rolling(window=3, center=True).var())
+df=df.assign(falta_var7=aux[aux.columns[9]].rolling(window=7, center=True).var())
+df=df.assign(falta_var11=aux[aux.columns[9]].rolling(window=11, center=True).var())
 
 #precipitacao
-df=df.assign(prec_var3=df[df.columns[10]].rolling(window=3, center=True).var())
-df=df.assign(prec_var7=df[df.columns[10]].rolling(window=7, center=True).var())
-df=df.assign(prec_var11=df[df.columns[10]].rolling(window=11, center=True).var())
+df=df.assign(prec_var3=aux[aux.columns[10]].rolling(window=3, center=True).var())
+df=df.assign(prec_var7=aux[aux.columns[10]].rolling(window=7, center=True).var())
+df=df.assign(prec_var11=aux[aux.columns[10]].rolling(window=11, center=True).var())
 
 #irradiancia normalizada
-df=df.assign(irrn_var3=df[df.columns[13]].rolling(window=3, center=True).var())
-df=df.assign(irrn_var7=df[df.columns[13]].rolling(window=7, center=True).var())
-df=df.assign(irrn_var11=df[df.columns[13]].rolling(window=11, center=True).var())
+df=df.assign(irrn_var3=aux[aux.columns[13]].rolling(window=3, center=True).var())
+df=df.assign(irrn_var7=aux[aux.columns[13]].rolling(window=7, center=True).var())
+df=df.assign(irrn_var11=aux[aux.columns[13]].rolling(window=11, center=True).var())
 
-nwpgrid['D']['central']=df
+
+#Retirar nan iniciais e finais - colocar igual a previsao imediatamente seguinte/anterior 
+df=df.ffill()
+df=df.bfill()
+
+dados_calc={'var_temp': {'D': {'central': df}}}
 
 
 
@@ -616,262 +622,603 @@ nwpgrid['D']['central']=df
 for a in range(1,7):
   for b in range(1,7):
     
-    df=nwpgrid['D'][str(a)+'x'+str(b)]
+    aux=nwpgrid['D'][str(a)+'x'+str(b)]
+    df=pd.DataFrame()
     
     #frac. total
-    df=df.assign(ftotal_var3=df[df.columns[3]].rolling(window=3, center=True).var())
-    df=df.assign(ftotal_var7=df[df.columns[3]].rolling(window=7, center=True).var())
-    df=df.assign(ftotal_var11=df[df.columns[3]].rolling(window=11, center=True).var())
+    df=df.assign(ftotal_var3=aux[aux.columns[3]].rolling(window=3, center=True).var())
+    df=df.assign(ftotal_var7=aux[aux.columns[3]].rolling(window=7, center=True).var())
+    df=df.assign(ftotal_var11=aux[aux.columns[3]].rolling(window=11, center=True).var())
     
     #frac. baixa
-    df=df.assign(fbaixa_var3=df[df.columns[4]].rolling(window=3, center=True).var())
-    df=df.assign(fbaixa_var7=df[df.columns[4]].rolling(window=7, center=True).var())
-    df=df.assign(fbaixa_var11=df[df.columns[4]].rolling(window=11, center=True).var())
+    df=df.assign(fbaixa_var3=aux[aux.columns[4]].rolling(window=3, center=True).var())
+    df=df.assign(fbaixa_var7=aux[aux.columns[4]].rolling(window=7, center=True).var())
+    df=df.assign(fbaixa_var11=aux[aux.columns[4]].rolling(window=11, center=True).var())
     
     #frac. media
-    df=df.assign(fmedia_var3=df[df.columns[5]].rolling(window=3, center=True).var())
-    df=df.assign(fmedia_var7=df[df.columns[5]].rolling(window=7, center=True).var())
-    df=df.assign(fmedia_var11=df[df.columns[5]].rolling(window=11, center=True).var())
+    df=df.assign(fmedia_var3=aux[aux.columns[5]].rolling(window=3, center=True).var())
+    df=df.assign(fmedia_var7=aux[aux.columns[5]].rolling(window=7, center=True).var())
+    df=df.assign(fmedia_var11=aux[aux.columns[5]].rolling(window=11, center=True).var())
     
     #frac. alta
-    df=df.assign(falta_var3=df[df.columns[6]].rolling(window=3, center=True).var())
-    df=df.assign(falta_var7=df[df.columns[6]].rolling(window=7, center=True).var())
-    df=df.assign(falta_var11=df[df.columns[6]].rolling(window=11, center=True).var())
+    df=df.assign(falta_var3=aux[aux.columns[6]].rolling(window=3, center=True).var())
+    df=df.assign(falta_var7=aux[aux.columns[6]].rolling(window=7, center=True).var())
+    df=df.assign(falta_var11=aux[aux.columns[6]].rolling(window=11, center=True).var())
     
     #irradiancia normalizada
-    df=df.assign(irrn_var3=df[df.columns[8]].rolling(window=3, center=True).var())
-    df=df.assign(irrn_var7=df[df.columns[8]].rolling(window=7, center=True).var())
-    df=df.assign(irrn_var11=df[df.columns[8]].rolling(window=11, center=True).var())
+    df=df.assign(irrn_var3=aux[aux.columns[8]].rolling(window=3, center=True).var())
+    df=df.assign(irrn_var7=aux[aux.columns[8]].rolling(window=7, center=True).var())
+    df=df.assign(irrn_var11=aux[aux.columns[8]].rolling(window=11, center=True).var())
     
-    nwpgrid['D'][str(a)+'x'+str(b)]=df
+    #Retirar nan iniciais e finais - colocar igual a previsao imediatamente seguinte/anterior 
+    df=df.ffill()
+    df=df.bfill()
+  
+
+    dados_calc['var_temp']['D'][str(a)+'x'+str(b)]=df
 
 
 
 #lags 
     
 #central
-df=nwpgrid['D']['central']
-    
+aux=nwpgrid['D']['central']
+df=pd.DataFrame()
+ 
 #temperatura
-df=df.assign(temp_lag1=df[df.columns[0]].shift(periods=1))
-df=df.assign(temp_lag2=df[df.columns[0]].shift(periods=2))
-df=df.assign(temp_lag3=df[df.columns[0]].shift(periods=3))
+df=df.assign(temp_lag1=aux[aux.columns[0]].shift(periods=1))
+df=df.assign(temp_lag2=aux[aux.columns[0]].shift(periods=2))
+df=df.assign(temp_lag3=aux[aux.columns[0]].shift(periods=3))
 
 #pressao
-df=df.assign(pres_lag1=df[df.columns[2]].shift(periods=1))
-df=df.assign(pres_lag2=df[df.columns[2]].shift(periods=2))
-df=df.assign(pres_lag3=df[df.columns[2]].shift(periods=3))
+df=df.assign(pres_lag1=aux[aux.columns[2]].shift(periods=1))
+df=df.assign(pres_lag2=aux[aux.columns[2]].shift(periods=2))
+df=df.assign(pres_lag3=aux[aux.columns[2]].shift(periods=3))
 
 #velociade vento
-df=df.assign(vel_lag1=df[df.columns[3]].shift(periods=1))
-df=df.assign(vel_lag2=df[df.columns[3]].shift(periods=2))
-df=df.assign(vel_lag3=df[df.columns[3]].shift(periods=3))
+df=df.assign(vel_lag1=aux[aux.columns[3]].shift(periods=1))
+df=df.assign(vel_lag2=aux[aux.columns[3]].shift(periods=2))
+df=df.assign(vel_lag3=aux[aux.columns[3]].shift(periods=3))
 
 #direcao vento
-df=df.assign(dir_lag1=df[df.columns[4]].shift(periods=1))
-df=df.assign(dir_lag2=df[df.columns[4]].shift(periods=2))
-df=df.assign(dir_lag3=df[df.columns[4]].shift(periods=3))
+df=df.assign(dir_lag1=aux[aux.columns[4]].shift(periods=1))
+df=df.assign(dir_lag2=aux[aux.columns[4]].shift(periods=2))
+df=df.assign(dir_lag3=aux[aux.columns[4]].shift(periods=3))
 
 #humidade relativa
-df=df.assign(humr_lag1=df[df.columns[5]].shift(periods=1))
-df=df.assign(humr_lag2=df[df.columns[5]].shift(periods=2))
-df=df.assign(humr_lag3=df[df.columns[5]].shift(periods=3))
+df=df.assign(humr_lag1=aux[aux.columns[5]].shift(periods=1))
+df=df.assign(humr_lag2=aux[aux.columns[5]].shift(periods=2))
+df=df.assign(humr_lag3=aux[aux.columns[5]].shift(periods=3))
 
 #frac total
-df=df.assign(ftotal_lag1=df[df.columns[6]].shift(periods=1))
-df=df.assign(ftotal_lag2=df[df.columns[6]].shift(periods=2))
-df=df.assign(ftotal_lag3=df[df.columns[6]].shift(periods=3))
+df=df.assign(ftotal_lag1=aux[aux.columns[6]].shift(periods=1))
+df=df.assign(ftotal_lag2=aux[aux.columns[6]].shift(periods=2))
+df=df.assign(ftotal_lag3=aux[aux.columns[6]].shift(periods=3))
 
 #frac baixa
-df=df.assign(fbaixa_lag1=df[df.columns[7]].shift(periods=1))
-df=df.assign(fbaixa_lag2=df[df.columns[7]].shift(periods=2))
-df=df.assign(fbaixa_lag3=df[df.columns[7]].shift(periods=3))
+df=df.assign(fbaixa_lag1=aux[aux.columns[7]].shift(periods=1))
+df=df.assign(fbaixa_lag2=aux[aux.columns[7]].shift(periods=2))
+df=df.assign(fbaixa_lag3=aux[aux.columns[7]].shift(periods=3))
 
 #frac media
-df=df.assign(fmedia_lag1=df[df.columns[8]].shift(periods=1))
-df=df.assign(fmedia_lag2=df[df.columns[8]].shift(periods=2))
-df=df.assign(fmedia_lag3=df[df.columns[8]].shift(periods=3))
+df=df.assign(fmedia_lag1=aux[aux.columns[8]].shift(periods=1))
+df=df.assign(fmedia_lag2=aux[aux.columns[8]].shift(periods=2))
+df=df.assign(fmedia_lag3=aux[aux.columns[8]].shift(periods=3))
 
 #frac alta
-df=df.assign(falta_lag1=df[df.columns[9]].shift(periods=1))
-df=df.assign(falta_lag2=df[df.columns[9]].shift(periods=2))
-df=df.assign(falta_lag3=df[df.columns[9]].shift(periods=3))
+df=df.assign(falta_lag1=aux[aux.columns[9]].shift(periods=1))
+df=df.assign(falta_lag2=aux[aux.columns[9]].shift(periods=2))
+df=df.assign(falta_lag3=aux[aux.columns[9]].shift(periods=3))
 
 #precipitacao
-df=df.assign(prec_lag1=df[df.columns[10]].shift(periods=1))
-df=df.assign(prec_lag2=df[df.columns[10]].shift(periods=2))
-df=df.assign(prec_lag3=df[df.columns[10]].shift(periods=3))
+df=df.assign(prec_lag1=aux[aux.columns[10]].shift(periods=1))
+df=df.assign(prec_lag2=aux[aux.columns[10]].shift(periods=2))
+df=df.assign(prec_lag3=aux[aux.columns[10]].shift(periods=3))
 
 #irradiancia normalizada
-df=df.assign(irrn_lag1=df[df.columns[13]].shift(periods=1))
-df=df.assign(irrn_lag2=df[df.columns[13]].shift(periods=2))
-df=df.assign(irrn_lag3=df[df.columns[13]].shift(periods=3))
+df=df.assign(irrn_lag1=aux[aux.columns[13]].shift(periods=1))
+df=df.assign(irrn_lag2=aux[aux.columns[13]].shift(periods=2))
+df=df.assign(irrn_lag3=aux[aux.columns[13]].shift(periods=3))
 
 
-nwpgrid['D']['central']=df
+
+#Retirar nan iniciais - colocar igual a previsao imediatamente seguinte
+df = df.bfill()
+
+dados_calc['lags']={'D': {'central': df}}
+
+
+
 
 #nwp grid
 for a in range(1,7):
   for b in range(1,7):
     
-    df=nwpgrid['D'][str(a)+'x'+str(b)]
+    aux=nwpgrid['D'][str(a)+'x'+str(b)]
+    df=pd.DataFrame()
     
     ##frac. total
-    df=df.assign(ftotal_lag1=df[df.columns[3]].shift(periods=1))
-    df=df.assign(ftotal_lag2=df[df.columns[3]].shift(periods=2))
-    df=df.assign(ftotal_lag3=df[df.columns[3]].shift(periods=3))
+    df=df.assign(ftotal_lag1=aux[aux.columns[3]].shift(periods=1))
+    df=df.assign(ftotal_lag2=aux[aux.columns[3]].shift(periods=2))
+    df=df.assign(ftotal_lag3=aux[aux.columns[3]].shift(periods=3))
     
     #frac. baixa
-    df=df.assign(fbaixa_lag1=df[df.columns[4]].shift(periods=1))
-    df=df.assign(fbaixa_lag2=df[df.columns[4]].shift(periods=2))
-    df=df.assign(fbaixa_lag3=df[df.columns[4]].shift(periods=3))
+    df=df.assign(fbaixa_lag1=aux[aux.columns[4]].shift(periods=1))
+    df=df.assign(fbaixa_lag2=aux[aux.columns[4]].shift(periods=2))
+    df=df.assign(fbaixa_lag3=aux[aux.columns[4]].shift(periods=3))
     
     #frac. media
-    df=df.assign(fmedia_lag1=df[df.columns[5]].shift(periods=1))
-    df=df.assign(fmedia_lag2=df[df.columns[5]].shift(periods=2))
-    df=df.assign(fmedia_lag3=df[df.columns[5]].shift(periods=3))
+    df=df.assign(fmedia_lag1=aux[aux.columns[5]].shift(periods=1))
+    df=df.assign(fmedia_lag2=aux[aux.columns[5]].shift(periods=2))
+    df=df.assign(fmedia_lag3=aux[aux.columns[5]].shift(periods=3))
     
     #frac. alta
-    df=df.assign(falta_lag1=df[df.columns[6]].shift(periods=1))
-    df=df.assign(falta_lag2=df[df.columns[6]].shift(periods=2))
-    df=df.assign(falta_lag3=df[df.columns[6]].shift(periods=3))
+    df=df.assign(falta_lag1=aux[aux.columns[6]].shift(periods=1))
+    df=df.assign(falta_lag2=aux[aux.columns[6]].shift(periods=2))
+    df=df.assign(falta_lag3=aux[aux.columns[6]].shift(periods=3))
     
     #irradiancia normalizada
-    df=df.assign(irrn_lag1=df[df.columns[8]].shift(periods=1))
-    df=df.assign(irrn_lag2=df[df.columns[8]].shift(periods=2))
-    df=df.assign(irrn_lag3=df[df.columns[8]].shift(periods=3))
+    df=df.assign(irrn_lag1=aux[aux.columns[8]].shift(periods=1))
+    df=df.assign(irrn_lag2=aux[aux.columns[8]].shift(periods=2))
+    df=df.assign(irrn_lag3=aux[aux.columns[8]].shift(periods=3))
     
-    nwpgrid['D'][str(a)+'x'+str(b)]=df
+    
+    #Retirar nan iniciais - colocar igual a ao valor imediatamente seguinte
+    df=df.bfill()
+    
+    dados_calc['lags']['D'][str(a)+'x'+str(b)]=df
 
 
-############################# EM DESENVOLVIMENTO ##############################
-
-#Média 4 previsoes ____________________________________________________________
-'''falta saber como aplicar o ewm().mean sem erros. a estrutura ja esta montada'''
 
 
-#para ter o index sincronizado
-df=pd.concat([nwpgrid['D']['1x1'], nwpgrid['D+1']['1x1'], nwpgrid['D+2']['1x1'], nwpgrid['D+3']['1x1']], axis=1, sort=True)
 
-#criar df media para central e cada pto da grid
-cols=['temperatura', 'irr_norm', 'pressao', 'velocidade', 'direcao', 'hum. relativa',
-      'frac. total', 'frac. baixa', 'frac. media', 'frac. alta', 'precipitacao', 'pot_norm']
 
-media = {'central': pd.DataFrame(index=[df.index], columns=cols)
-        }
-media['central'].set_index(df.index, inplace = True)
+#leads 
+    
+#central
+df=pd.DataFrame()
+aux=nwpgrid['D']['central']
+    
+#temperatura
+df=df.assign(temp_lead1=aux[aux.columns[0]].shift(periods=-1))
+df=df.assign(temp_lead2=aux[aux.columns[0]].shift(periods=-2))
+df=df.assign(temp_lead3=aux[aux.columns[0]].shift(periods=-3))
 
-cols=['irr_norm', 'frac. total', 'frac. baixa', 'frac. media', 'frac. alta']
+#pressao
+df=df.assign(pres_lead1=aux[aux.columns[2]].shift(periods=-1))
+df=df.assign(pres_lead2=aux[aux.columns[2]].shift(periods=-2))
+df=df.assign(pres_lead3=aux[aux.columns[2]].shift(periods=-3))
 
-for a in range(1,7):
-    for b in range(1,7):
-        media[str(a)+'x'+str(b)] = pd.DataFrame(index=[df.index], columns=cols)
-        media[str(a)+'x'+str(b)].set_index(df.index, inplace = True)
-        
+#velociade vento
+df=df.assign(vel_lead1=aux[aux.columns[3]].shift(periods=-1))
+df=df.assign(vel_lead2=aux[aux.columns[3]].shift(periods=-2))
+df=df.assign(vel_lead3=aux[aux.columns[3]].shift(periods=-3))
 
-#media dos pts da grid
-        
+#direcao vento
+df=df.assign(dir_lead1=aux[aux.columns[4]].shift(periods=-1))
+df=df.assign(dir_lead2=aux[aux.columns[4]].shift(periods=-2))
+df=df.assign(dir_lead3=aux[aux.columns[4]].shift(periods=-3))
+
+#humidade relativa
+df=df.assign(humr_lead1=aux[aux.columns[5]].shift(periods=-1))
+df=df.assign(humr_lead2=aux[aux.columns[5]].shift(periods=-2))
+df=df.assign(humr_lead3=aux[aux.columns[5]].shift(periods=-3))
+
+#frac total
+df=df.assign(ftotal_lead1=aux[aux.columns[6]].shift(periods=-1))
+df=df.assign(ftotal_lead2=aux[aux.columns[6]].shift(periods=-2))
+df=df.assign(ftotal_lead3=aux[aux.columns[6]].shift(periods=-3))
+
+#frac baixa
+df=df.assign(fbaixa_lead1=aux[aux.columns[7]].shift(periods=-1))
+df=df.assign(fbaixa_lead2=aux[aux.columns[7]].shift(periods=-2))
+df=df.assign(fbaixa_lead3=aux[aux.columns[7]].shift(periods=-3))
+
+#frac media
+df=df.assign(fmedia_lead1=aux[aux.columns[8]].shift(periods=-1))
+df=df.assign(fmedia_lead2=aux[aux.columns[8]].shift(periods=-2))
+df=df.assign(fmedia_lead3=aux[aux.columns[8]].shift(periods=-3))
+
+#frac alta
+df=df.assign(falta_lead1=aux[aux.columns[9]].shift(periods=-1))
+df=df.assign(falta_lead2=aux[aux.columns[9]].shift(periods=-2))
+df=df.assign(falta_lead3=aux[aux.columns[9]].shift(periods=-3))
+
+#precipitacao
+df=df.assign(prec_lead1=aux[aux.columns[10]].shift(periods=-1))
+df=df.assign(prec_lead2=aux[aux.columns[10]].shift(periods=-2))
+df=df.assign(prec_lead3=aux[aux.columns[10]].shift(periods=-3))
+
 #irradiancia normalizada
+df=df.assign(irrn_lead1=aux[aux.columns[13]].shift(periods=-1))
+df=df.assign(irrn_lead2=aux[aux.columns[13]].shift(periods=-2))
+df=df.assign(irrn_lead3=aux[aux.columns[13]].shift(periods=-3))
+
+
+
+#Retirar nan finais - colocar igual a previsao imediatamente anterior
+df=df.ffill()
+
+
+dados_calc['leads']={'D': {'central': df}}
+
+#nwp grid
 for a in range(1,7):
   for b in range(1,7):
-    df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='irr_norm', axis=1)
-    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
-    media[str(a)+'x'+str(b)]['irr_norm'] = aux['media']
-   
-#frac. total
+    
+    df=pd.DataFrame()
+    aux=nwpgrid['D'][str(a)+'x'+str(b)]
+    
+    ##frac. total
+    df=df.assign(ftotal_lead1=aux[aux.columns[3]].shift(periods=-1))
+    df=df.assign(ftotal_lead2=aux[aux.columns[3]].shift(periods=-2))
+    df=df.assign(ftotal_lead3=aux[aux.columns[3]].shift(periods=-3))
+    
+    #frac. baixa
+    df=df.assign(fbaixa_lead1=aux[aux.columns[4]].shift(periods=-1))
+    df=df.assign(fbaixa_lead2=aux[aux.columns[4]].shift(periods=-2))
+    df=df.assign(fbaixa_lead3=aux[aux.columns[4]].shift(periods=-3))
+    
+    #frac. media
+    df=df.assign(fmedia_lead1=aux[aux.columns[5]].shift(periods=-1))
+    df=df.assign(fmedia_lead2=aux[aux.columns[5]].shift(periods=-2))
+    df=df.assign(fmedia_lead3=aux[aux.columns[5]].shift(periods=-3))
+    
+    #frac. alta
+    df=df.assign(falta_lead1=aux[aux.columns[6]].shift(periods=-1))
+    df=df.assign(falta_lead2=aux[aux.columns[6]].shift(periods=-2))
+    df=df.assign(falta_lead3=aux[aux.columns[6]].shift(periods=-3))
+    
+    #irradiancia normalizada
+    df=df.assign(irrn_lead1=aux[aux.columns[8]].shift(periods=-1))
+    df=df.assign(irrn_lead2=aux[aux.columns[8]].shift(periods=-2))
+    df=df.assign(irrn_lead3=aux[aux.columns[8]].shift(periods=-3))
+    
+    
+    #Retirar nan finais - colocar igual a previsao imediatamente anterior
+    df=df.ffill()
+    
+    dados_calc['leads']['D'][str(a)+'x'+str(b)]=df
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#EXTRA: MEDIAS TEMPORAIS (janelas de 3, 7 e 11 horas)
+
+
+#central
+df=pd.DataFrame()
+aux=nwpgrid['D']['central']
+    
+
+#direcao vento
+df=df.assign(dir_med3=aux[aux.columns[4]].rolling(window=3, center=True).mean())
+df=df.assign(dir_med7=aux[aux.columns[4]].rolling(window=7, center=True).mean())
+df=df.assign(dir_med11=aux[aux.columns[4]].rolling(window=11, center=True).mean())
+
+
+#frac total
+df=df.assign(ftotal_med3=aux[aux.columns[6]].rolling(window=3, center=True).mean())
+df=df.assign(ftotal_med7=aux[aux.columns[6]].rolling(window=7, center=True).mean())
+df=df.assign(ftotal_med11=aux[aux.columns[6]].rolling(window=11, center=True).mean())
+
+
+#frac baixa
+df=df.assign(fbaixa_med3=aux[aux.columns[7]].rolling(window=3, center=True).mean())
+df=df.assign(fbaixa_med7=aux[aux.columns[7]].rolling(window=7, center=True).mean())
+df=df.assign(fbaixa_med11=aux[aux.columns[7]].rolling(window=11, center=True).mean())
+
+#frac media
+df=df.assign(fmedia_med3=aux[aux.columns[8]].rolling(window=3, center=True).mean())
+df=df.assign(fmedia_med7=aux[aux.columns[8]].rolling(window=7, center=True).mean())
+df=df.assign(fmedia_med11=aux[aux.columns[8]].rolling(window=11, center=True).mean())
+
+#frac alta
+df=df.assign(falta_med3=aux[aux.columns[9]].rolling(window=3, center=True).mean())
+df=df.assign(falta_med7=aux[aux.columns[9]].rolling(window=7, center=True).mean())
+df=df.assign(falta_med11=aux[aux.columns[9]].rolling(window=11, center=True).mean())
+
+
+#precipitacao
+df=df.assign(prec_med3=aux[aux.columns[10]].rolling(window=3, center=True).mean())
+df=df.assign(prec_med7=aux[aux.columns[10]].rolling(window=7, center=True).mean())
+df=df.assign(prec_med11=aux[aux.columns[10]].rolling(window=11, center=True).mean())
+
+#irradiancia normalizada
+df=df.assign(irrn_med3=aux[aux.columns[13]].rolling(window=3, center=True).mean())
+df=df.assign(irrn_med7=aux[aux.columns[13]].rolling(window=7, center=True).mean())
+df=df.assign(irrn_med11=aux[aux.columns[13]].rolling(window=11, center=True).mean())
+df=df.assign(irrn_med25=aux[aux.columns[13]].rolling(window=25, center=True).mean())
+
+#Retirar nan iniciais e finais - colocar igual a previsao imediatamente anterior/seguinte
+df=df.ffill()
+df=df.bfill()
+
+
+dados_calc['media_temp']={'D': {'central': df}}
+
+
+
+
+#nwp grid
 for a in range(1,7):
   for b in range(1,7):
-    df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='Fraccion total', axis=1)
-    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
-    media[str(a)+'x'+str(b)]['frac. total'] = aux['media']     
+    
+    df=pd.DataFrame()
+    aux=nwpgrid['D'][str(a)+'x'+str(b)]
+    
+    #frac. total
+    df=df.assign(ftotal_med3=aux[aux.columns[3]].rolling(window=3, center=True).mean())
+    df=df.assign(ftotal_med7=aux[aux.columns[3]].rolling(window=7, center=True).mean())
+    df=df.assign(ftotal_med11=aux[aux.columns[3]].rolling(window=11, center=True).mean())
+    
+    #frac. baixa
+    df=df.assign(fbaixa_med3=aux[aux.columns[4]].rolling(window=3, center=True).mean())
+    df=df.assign(fbaixa_med7=aux[aux.columns[4]].rolling(window=7, center=True).mean())
+    df=df.assign(fbaixa_med11=aux[aux.columns[4]].rolling(window=11, center=True).mean())
+    
+    #frac. media
+    df=df.assign(fmedia_med3=aux[aux.columns[5]].rolling(window=3, center=True).mean())
+    df=df.assign(fmedia_med7=aux[aux.columns[5]].rolling(window=7, center=True).mean())
+    df=df.assign(fmedia_med11=aux[aux.columns[5]].rolling(window=11, center=True).mean())
+
+    #frac. alta
+    df=df.assign(falta_med3=aux[aux.columns[6]].rolling(window=3, center=True).mean())
+    df=df.assign(falta_med7=aux[aux.columns[6]].rolling(window=7, center=True).mean())
+    df=df.assign(falta_med11=aux[aux.columns[6]].rolling(window=11, center=True).mean())
+
+    #irradiancia normalizada
+    df=df.assign(irrn_med3=aux[aux.columns[8]].rolling(window=3, center=True).mean())
+    df=df.assign(irrn_med7=aux[aux.columns[8]].rolling(window=7, center=True).mean())
+    df=df.assign(irrn_med11=aux[aux.columns[8]].rolling(window=11, center=True).mean())
+    df=df.assign(irrn_med25=aux[aux.columns[8]].rolling(window=25, center=True).mean())
+
+
+    #Retirar nan iniciais e finais - colocar igual a previsao imediatamente anterior/seguinte
+    df=df.ffill()
+    df=df.bfill()
+  
+
+    dados_calc['media_temp']['D'][str(a)+'x'+str(b)]=df
+
+
+
+
+
+
+
+
+#desvio padrao espacial
+
+
+aux=pd.DataFrame()
+for a in range(1,7):
+  for b in range(1,7):
+    df=pd.concat([df, nwpgrid['D'][str(a)+'x'+str(b)]], axis=1, sort=True)
+
+#frac. total    
+df1=df.filter(like='Fraccion total', axis=1)
+aux=aux.assign(ftotal_dps=df1.std(axis=1))
+
     
 #frac. baixa
-for a in range(1,7):
-  for b in range(1,7):
-    df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='Frac. Baja', axis=1)
-    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
-    media[str(a)+'x'+str(b)]['frac. baixa'] = aux['media']    
+df1=df.filter(like='Frac. Baja', axis=1)
+aux=aux.assign(fbaixa_dps=df1.std(axis=1))
     
 #frac. media
-for a in range(1,7):
-  for b in range(1,7):
-    df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='Frac. Media', axis=1)
-    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
-    media[str(a)+'x'+str(b)]['frac. media'] = aux['media'] 
+df1=df.filter(like='Frac. Media', axis=1)
+aux=aux.assign(fmedia_dps=df1.std(axis=1))
 
 #frac. alta
+df1=df.filter(like='Frac. Alta', axis=1)
+aux=aux.assign(falta_dps=df1.std(axis=1))
+
+
+#irradiancia normalizada
+df1=df.filter(like='irr_norm', axis=1)
+aux=aux.assign(irrn_dps=df1.std(axis=1))
+
+    
+dados_calc['dp_esp']={'D': aux}   
+ 
+    
+    
+    
+
+
+
+
+
+
+
+#Média 4 previsoes ____________________________________________________________
+
+
+#pesos
+span=4
+alpha=2/(span+1)
+w=[(1-alpha)**0, (1-alpha)**1, (1-alpha)**2, (1-alpha)**3]
+
+
+aux=pd.DataFrame()
+dados_calc['media_prev']={}
+#media dos pts da grid
+  
 for a in range(1,7):
   for b in range(1,7):
     df=pd.concat([nwpgrid['D'][str(a)+'x'+str(b)], nwpgrid['D+1'][str(a)+'x'+str(b)], nwpgrid['D+2'][str(a)+'x'+str(b)], nwpgrid['D+3'][str(a)+'x'+str(b)]], axis=1, sort=False)
-    aux=df.filter(like='Frac. Alta', axis=1)
-    aux=aux.assign(media=aux.ewm(span=4, axis=1).mean())
-    media[str(a)+'x'+str(b)]['frac. alta'] = aux['media'] 
     
+    
+    #irradiancia normalizada
+    df1=df.filter(like='irr_norm', axis=1)
+    aux=aux.assign(irrn_med_prev=np.average(df1, axis=1, weights=w), )
+    
+    #frac. total
+    df1=df.filter(like='Fraccion total', axis=1)
+    aux=aux.assign(ftotal_med_prev=np.average(df1, axis=1, weights=w))
+    
+    #frac. baixa
+    df1=df.filter(like='Frac. Baja', axis=1)
+    aux=aux.assign(fbaixa_med_prev=np.average(df1, axis=1, weights=w))
+    
+    #frac. media
+    df1=df.filter(like='Frac. Media', axis=1)
+    aux=aux.assign(fmedia_med_prev=np.average(df1, axis=1, weights=w))
+    
+    #frac. alta
+    df1=df.filter(like='Frac. Alta', axis=1)
+    aux=aux.assign(falta_med_prev=np.average(df1, axis=1, weights=w))
+    
+    dados_calc['media_prev'][str(a)+'x'+str(b)]= aux
+    dados_calc['media_prev'][str(a)+'x'+str(b)].index= df.index
 
     
-    
+
+
+aux=pd.DataFrame()    
     
 #media central
 df=pd.concat([nwpgrid['D']['central'], nwpgrid['D+1']['central'], nwpgrid['D+2']['central'], nwpgrid['D+3']['central']], axis=1, sort=True)
 
 #temperatura
-aux=df.filter(like='Temperatura', axis=1)
-aux=aux.assign(media=aux.mean(axis=1)) #com .mean() funciona
-media['central']['temperatura'] = aux['media']
+df1=df.filter(like='Temperatura', axis=1)
+aux=aux.assign(temp_med_prev=np.average(df1, axis=1, weights=w)) #com .mean() funciona
 
 #pressao
-aux=df.filter(like='Presión', axis=1) 
-aux=aux.assign(media=aux.ewm(span=4).mean()) #erro
-media['central']['pressao'] = aux['media']
+df1=df.filter(like='Presión', axis=1) 
+aux=aux.assign(pres_med_prev=np.average(df1, axis=1, weights=w)) #erro
 
 #velocidade
-aux=df.filter(like='Velocidad', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['velocidade'] = aux['media']
+df1=df.filter(like='Velocidad', axis=1)
+aux=aux.assign(vel_med_prev=np.average(df1, axis=1, weights=w))
    
 #velocidade
-aux=df.filter(like='Dirección', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['direcao'] = aux['media']
+df1=df.filter(like='Dirección', axis=1)
+aux=aux.assign(dir_med_prev=np.average(df1, axis=1, weights=w))
 
 #humidade relativa
-aux=df.filter(like='Humedad rel', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['hum. relativa'] = aux['media']
+df1=df.filter(like='Humedad rel', axis=1)
+aux=aux.assign(hum_med_prev=np.average(df1, axis=1, weights=w))
 
 #frac. total
-aux=df.filter(like='Fraccion total.36', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['frac. total'] = aux['media']    
+df1=df.filter(like='Fraccion total.36', axis=1)
+aux=aux.assign(ftotal_med_prev=np.average(df1, axis=1, weights=w))
     
 #frac. baixa
-aux=df.filter(like='Frac. Baja.36', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['frac. baixa'] = aux['media']     
+df1=df.filter(like='Frac. Baja.36', axis=1)
+aux=aux.assign(fbaixa_med_prev=np.average(df1, axis=1, weights=w))
     
 #frac. media
-aux=df.filter(like='Frac. Media.36', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['frac. media'] = aux['media']    
+df1=df.filter(like='Frac. Media.36', axis=1)
+aux=aux.assign(fmedia_med_prev=np.average(df1, axis=1, weights=w))
 
 #frac. alta
-aux=df.filter(like='Frac. Alta.36', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['frac. alta'] = aux['media']    
+df1=df.filter(like='Frac. Alta', axis=1)
+aux=aux.assign(falta_med_prev=np.average(df1, axis=1, weights=w))
 
 #precipitacao
-aux=df.filter(like='Precipitación', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['precipitacao'] = aux['media']
+df1=df.filter(like='Precipitación', axis=1)
+aux=aux.assign(prec_med_prev=np.average(df1, axis=1, weights=w))
 
 #irradiancia normalizada
-aux=df.filter(like='irr_norm', axis=1)
-aux=aux.assign(media=aux.ewm(span=4, axis=0).mean())
-media['central']['irr_norm'] = aux['media']
+df1=df.filter(like='irr_norm', axis=1)
+aux=aux.assign(irrn_med_prev=np.average(df1, axis=1, weights=w))
+
+dados_calc['media_prev']['central']=aux
+dados_calc['media_prev']['central'].index= df.index
+
+
+
+#Retirar nan dos dias 1-1-2017, 2-1-2017 e 3-1-2017 
+#colocar igual a previsao do dia seguinte a mesma hora
+dados_calc['media_prev']['central'].iloc[47:71,:] = dados_calc['media_prev']['central'].iloc[71:95,:].values
+dados_calc['media_prev']['central'].iloc[23:47,:] = dados_calc['media_prev']['central'].iloc[71:95,:].values
+dados_calc['media_prev']['central'].iloc[0:23,:] = dados_calc['media_prev']['central'].iloc[72:95,:].values
+
+for a in range(1,7):
+  for b in range(1,7):
+    dados_calc['media_prev'][str(a)+'x'+str(b)].iloc[47:71,:] = dados_calc['media_prev'][str(a)+'x'+str(b)].iloc[71:95,:].values
+    dados_calc['media_prev'][str(a)+'x'+str(b)].iloc[23:47,:] = dados_calc['media_prev'][str(a)+'x'+str(b)].iloc[71:95,:].values
+    dados_calc['media_prev'][str(a)+'x'+str(b)].iloc[0:23,:] = dados_calc['media_prev'][str(a)+'x'+str(b)].iloc[72:95,:].values
+
+
+#Retirar nan do dia 31/05/2020
+#colocar igual a previsao do dia anterior a mesma hora
+dados_calc['media_prev']['central'].iloc[-24:,:] = dados_calc['media_prev']['central'].iloc[-48:-24,:].values
+
+for a in range(1,7):
+  for b in range(1,7):
+    dados_calc['media_prev'][str(a)+'x'+str(b)].iloc[-24:,:] = dados_calc['media_prev'][str(a)+'x'+str(b)].iloc[-48:-24,:].values
+
+
+
+
+#Retirar nan das 00:00:00 horas
+#media de toda a df preenchida com o elemento anterior com toda a df preenchida com o elemento seguinte - valores nan dao a media dos 2 e os outros mantem-se
+dados_calc['media_prev']['central'] = (dados_calc['media_prev']['central'].ffill()+dados_calc['media_prev']['central'].bfill())/2
+
+for a in range(1,7):
+  for b in range(1,7):
+    dados_calc['media_prev'][str(a)+'x'+str(b)] = (dados_calc['media_prev'][str(a)+'x'+str(b)].ffill()+dados_calc['media_prev'][str(a)+'x'+str(b)].bfill())/2
+
+
+
+
+
+
+
+#Spatial Smoothing ____________________________________________________________
+
+#dividir em camadas
+layer1=pd.DataFrame() #df layer 1
+layer2=pd.DataFrame() #df layer 2
+layer3=pd.DataFrame() #df layer 3
+
+for a in range(1,7):
+  for b in range(1,7):
+    if(a==1 or b==1 or a==6 or b==6):
+      layer3=pd.concat((layer3, nwpgrid['D'][str(a)+'x'+str(b)]), axis=1, sort=True)
+    elif(str(a)+str(b)==str(33) or str(a)+str(b)==str(34) or str(a)+str(b)==str(44) or str(a)+str(b)==str(43)):
+      layer1=pd.concat((layer1, nwpgrid['D'][str(a)+'x'+str(b)]), axis=1, sort=True)
+    else:
+      layer2=pd.concat((layer2, nwpgrid['D'][str(a)+'x'+str(b)]), axis=1, sort=True)
+
+#media horaria da irradiancia em cada layer
+layer1=layer1.assign(irr_med1=layer1.mean(axis=1))
+layer2=layer2.assign(irr_med2=layer2.mean(axis=1))
+layer3=layer3.assign(irr_med3=layer3.mean(axis=1))
+
+
+aux=pd.concat((layer1['irr_med1'], layer2['irr_med2'], layer3['irr_med3']), axis=1, sort=True)
+
+#pesos
+span=4
+alpha=2/(span+1)
+w=[(1-alpha)**0, (1-alpha)**1, (1-alpha)**2]
+
+#media
+aux['media']=np.average(aux, axis=1, weights=w) 
+dados_calc['spatial_smoothing']= {'D': {'layers': aux[['irr_med1', 'irr_med2', 'irr_med3']],
+                                        'media': aux['media']}}
+
+
+
+
+
+
+
+
 
 
 
@@ -900,7 +1247,8 @@ prin_comp89 = {
 
 
 #D central 
-cols = [0,2,3,4,5,6,7,8,9,10,13]
+cols = [0,2,3,4,5,6,7,8,9,10,13] #so variaveis meteorologicas
+
 df=nwpgrid['D']['central'].iloc[:, cols]
 df=df.assign(elev_solar=nwpgrid['D']['elev_solar'])
 df.set_index(nwpgrid['D']['central'].index, inplace = True)
@@ -915,8 +1263,10 @@ pca = PCA(.89) #numero componentes que prefazem 89%
 pca.fit(df)
 prin_comp89['D']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
 
+
 #D grid
-cols = [3,4,5,6,8] 
+cols = [3,4,5,6,8] #so variaveis meteorologicas
+
 for a in range(1,7):
     for b in range(1,7):
       df=nwpgrid['D'][str(a)+'x'+str(b)].iloc[:, cols]
@@ -935,6 +1285,9 @@ df=nwpgrid['D']['central']['pot_norm']
 prin_comp89['D']['producao']=pd.DataFrame(data=df, index=df.index)
 
 prin_comp95['D']['producao']=pd.DataFrame(data=df, index=df.index)
+
+
+
 
 
 
@@ -1059,6 +1412,157 @@ prin_comp95['D+3']['producao']=pd.DataFrame(data=df, index=df.index)
 
 
 
+
+
+
+#dados calculados
+df=dados_calc['dp_esp']['D']
+prin_comp95['dados_calc']={}
+prin_comp89['dados_calc']={}
+prin_comp95['dados_calc']['lags']={}
+prin_comp89['dados_calc']['lags']={}
+prin_comp95['dados_calc']['leads']={}
+prin_comp89['dados_calc']['leads']={}
+prin_comp95['dados_calc']['media_prev']={}
+prin_comp89['dados_calc']['media_prev']={}
+prin_comp95['dados_calc']['media_temp']={}
+prin_comp89['dados_calc']['media_temp']={}
+prin_comp95['dados_calc']['var_temp']={}
+prin_comp89['dados_calc']['var_temp']={}
+
+
+
+
+pca = PCA(.95) #numero componentes que prefazem 95%
+pca.fit(df)
+prin_comp95['dados_calc']['dp_esp']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+pca = PCA(.89) #numero componentes que prefazem 89%
+pca.fit(df)
+prin_comp89['dados_calc']['dp_esp']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+
+for a in range(1,7):
+    for b in range(1,7):      
+      df=dados_calc['lags']['D'][str(a)+'x'+str(b)]
+      
+      pca = PCA(.95) #numero componentes que prefazem 95%
+      pca.fit(df)
+      prin_comp95['dados_calc']['lags'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+      pca = PCA(.89) #numero componentes que prefazem 89%
+      pca.fit(df)
+      prin_comp89['dados_calc']['lags'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+      
+      df=dados_calc['leads']['D'][str(a)+'x'+str(b)]
+      
+      pca = PCA(.95) #numero componentes que prefazem 95%
+      pca.fit(df)
+      prin_comp95['dados_calc']['leads'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+      pca = PCA(.89) #numero componentes que prefazem 89%
+      pca.fit(df)
+      prin_comp89['dados_calc']['leads'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+      df=dados_calc['media_prev'][str(a)+'x'+str(b)]
+      
+      pca = PCA(.95) #numero componentes que prefazem 95%
+      pca.fit(df)
+      prin_comp95['dados_calc']['media_prev'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+      pca = PCA(.89) #numero componentes que prefazem 89%
+      pca.fit(df)
+      prin_comp89['dados_calc']['media_prev'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+      df=dados_calc['media_temp']['D'][str(a)+'x'+str(b)]
+      
+      pca = PCA(.95) #numero componentes que prefazem 95%
+      pca.fit(df)
+      prin_comp95['dados_calc']['media_temp'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+      pca = PCA(.89) #numero componentes que prefazem 89%
+      pca.fit(df)
+      prin_comp89['dados_calc']['media_temp'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+      df=dados_calc['var_temp']['D'][str(a)+'x'+str(b)]
+      
+      pca = PCA(.95) #numero componentes que prefazem 95%
+      pca.fit(df)
+      prin_comp95['dados_calc']['var_temp'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+      pca = PCA(.89) #numero componentes que prefazem 89%
+      pca.fit(df)
+      prin_comp89['dados_calc']['var_temp'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+      
+df=dados_calc['lags']['D']['central']
+
+pca = PCA(.95) #numero componentes que prefazem 95%
+pca.fit(df)
+prin_comp95['dados_calc']['lags']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+pca = PCA(.89) #numero componentes que prefazem 89%
+pca.fit(df)
+prin_comp89['dados_calc']['lags']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+      
+      
+df=dados_calc['leads']['D']['central']
+      
+pca = PCA(.95) #numero componentes que prefazem 95%
+pca.fit(df)
+prin_comp95['dados_calc']['leads']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+pca = PCA(.89) #numero componentes que prefazem 89%
+pca.fit(df)
+prin_comp89['dados_calc']['leads']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+df=dados_calc['media_prev']['central']
+      
+pca = PCA(.95) #numero componentes que prefazem 95%
+pca.fit(df)
+prin_comp95['dados_calc']['media_prev']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+pca = PCA(.89) #numero componentes que prefazem 89%
+pca.fit(df)
+prin_comp89['dados_calc']['media_prev']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+
+df=dados_calc['media_temp']['D']['central']
+      
+pca = PCA(.95) #numero componentes que prefazem 95%
+pca.fit(df)
+prin_comp95['dados_calc']['media_temp']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+pca = PCA(.89) #numero componentes que prefazem 89%
+pca.fit(df)
+prin_comp89['dados_calc']['media_temp']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+df=dados_calc['var_temp']['D']['central']
+      
+pca = PCA(.95) #numero componentes que prefazem 95%
+pca.fit(df)
+prin_comp95['dados_calc']['var_temp']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+pca = PCA(.89) #numero componentes que prefazem 89%
+pca.fit(df)
+prin_comp89['dados_calc']['var_temp']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
+
+
+prin_comp95['dados_calc']['spatial_smoothing']=dados_calc['spatial_smoothing']['D']['media']
+prin_comp89['dados_calc']['spatial_smoothing']=dados_calc['spatial_smoothing']['D']['media']
+
+
+
+
 #print(pca.explained_variance_ratio_)
 
 
@@ -1081,66 +1585,113 @@ d1=0 #numero colunas dia 1
 d2=0 #numero colunas dia 2
 d3=0 #numero colunas dia 3
 
+#D
 df=pd.DataFrame()
 for a in range(1,7):
     for b in range(1,7):
       df=pd.concat([df, prin_comp89['D'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
       d0+=prin_comp89['D'][str(a)+'x'+str(b)].shape[1]
 
+df=pd.concat([df, prin_comp89['D']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
+d0+=prin_comp89['D']['central'].shape[1]
+
+
+#D+1
 d1+=d0      
 for a in range(1,7):
     for b in range(1,7):
       df=pd.concat([df, prin_comp89['D+1'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
       d1+=prin_comp89['D+1'][str(a)+'x'+str(b)].shape[1]
-      
+
+df=pd.concat([df, prin_comp89['D+1']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
+d1+=prin_comp89['D+1']['central'].shape[1]
+
+
+#D+2
 d2+=d1  
 for a in range(1,7):
     for b in range(1,7):
       df=pd.concat([df, prin_comp89['D+2'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
       d2+=prin_comp89['D+2'][str(a)+'x'+str(b)].shape[1]
-      
+
+df=pd.concat([df, prin_comp89['D+2']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
+d2+=prin_comp89['D+2']['central'].shape[1]
+
+#D+3
 d3+=d2   
 for a in range(1,7):
     for b in range(1,7):
       df=pd.concat([df, prin_comp89['D+3'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
       d3+=prin_comp89['D+3'][str(a)+'x'+str(b)].shape[1]
-      
+
+df=pd.concat([df, prin_comp89['D+3']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
+d3+=prin_comp89['D+3']['central'].shape[1]
+
+
 df.columns = range(df.shape[1])      
-x_train=df 
-
-
 
 
 #Retirar nan das 00:00:00 horas do dia D
 #media de toda a df preenchida com o elemento anterior com toda a df preenchida com o elemento seguinte - valores nan dao a media dos 2 e os outros mantem-se
-x_train.iloc[:,0:d0] = (x_train.iloc[:,0:d0].ffill()+x_train.iloc[:,0:d0].bfill())/2
+df.iloc[:,0:d0] = (df.iloc[:,0:d0].ffill()+df.iloc[:,0:d0].bfill())/2
 
 #Retirar nan do dia 1-1-2017 na previsao D+1
-#colocar igual a previsao imediatamente a seguir 
-x_train.iloc[0:23,d0:d1] = x_train.iloc[24:47,d0:d1].values
+#colocar igual a previsao do dia seguinte a mesma hora
+df.iloc[0:23,d0:d1] = df.iloc[24:47,d0:d1].values
 
 #Retirar nan dos dias 1-1-2017 e 2-1-2017 na previsao D+2
-#colocar igual a previsao imediatamente a seguir 
-x_train.iloc[23:47,d1:d2] = x_train.iloc[47:71,d1:d2].values
-x_train.iloc[0:23,d1:d2] = x_train.iloc[48:71,d1:d2].values
+#colocar igual a previsao do dia seguinte a mesma hora
+df.iloc[23:47,d1:d2] = df.iloc[47:71,d1:d2].values
+df.iloc[0:23,d1:d2] = df.iloc[48:71,d1:d2].values
 
 #Retirar nan dos dias 1-1-2017, 2-1-2017 e 3-1-2017 na previsao D+3
-#colocar igual a previsao imediatamente a seguir 
-x_train.iloc[47:71,d2:d3] = x_train.iloc[71:95,d2:d3].values
-x_train.iloc[23:47,d2:d3] = x_train.iloc[71:95,d2:d3].values
-x_train.iloc[0:23,d2:d3] = x_train.iloc[72:95,d2:d3].values
+#colocar igual a previsao do dia seguinte a mesma hora
+df.iloc[47:71,d2:d3] = df.iloc[71:95,d2:d3].values
+df.iloc[23:47,d2:d3] = df.iloc[71:95,d2:d3].values
+df.iloc[0:23,d2:d3] = df.iloc[72:95,d2:d3].values
+
+#tirar a x_train os dias que faltam a y_train para ficar sincrono
+df=pd.concat([df.loc['2017-01-02':'2019-02-27'], df.loc['2019-03-03':'2019-04-05'], df.loc['2019-04-09':'2019/12/31']])
 
 
 
+
+
+
+df1=pd.DataFrame()
+#dados calculados
+for a in range(1,7):
+    for b in range(1,7):
+      df1=pd.concat([df1, prin_comp89['dados_calc']['lags'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+      df1=pd.concat([df1, prin_comp89['dados_calc']['leads'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+      df1=pd.concat([df1, prin_comp89['dados_calc']['media_prev'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+      df1=pd.concat([df1, prin_comp89['dados_calc']['media_temp'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+      df1=pd.concat([df1, prin_comp89['dados_calc']['var_temp'][str(a)+'x'+str(b)].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
+
+df1=pd.concat([df1, prin_comp89['dados_calc']['lags']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+df1=pd.concat([df1, prin_comp89['dados_calc']['leads']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+df1=pd.concat([df1, prin_comp89['dados_calc']['media_prev']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+df1=pd.concat([df1, prin_comp89['dados_calc']['media_temp']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
+df1=pd.concat([df1, prin_comp89['dados_calc']['var_temp']['central'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
+
+df1=pd.concat([df1, prin_comp89['dados_calc']['dp_esp'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)      
+df1=pd.concat([df1, prin_comp89['dados_calc']['spatial_smoothing'].loc['2017-01-01':'2019/12/31']], axis=1, sort=True)
 
 
 
 #tirar a x_train os dias que faltam a y_train para ficar sincrono
-x_train=pd.concat([x_train.loc['2017-01-02':'2019-02-27'], x_train.loc['2019-03-03':'2019-04-05'], x_train.loc['2019-04-09':'2019/12/31']])
+df1=pd.concat([df1.loc['2017-01-02':'2019-02-27'], df1.loc['2019-03-03':'2019-04-05'], df1.loc['2019-04-09':'2019/12/31']])
+df1 = (df.ffill()+df.bfill())/2
+
+df=pd.concat([df, df1], axis=1, sort=True)      
+
+df.columns = range(df.shape[1])      
+x_train=df 
+
 
 #x_train.isnull().sum().sum()
 ''' onde estao os nulls
-df_null = x_test.isnull().unstack()
+df_null = x_train.isnull().unstack()
 t = df_null[df_null]'''
 
 
@@ -1154,88 +1705,214 @@ y=np.where(x_train.index.isin(y_train.index) == False)'''
 
 
 
+
+
+
 #TESTE
 
+
+#D
 df=pd.DataFrame()
 for a in range(1,7):
     for b in range(1,7):
       df=pd.concat([df, prin_comp89['D'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+      d0+=prin_comp89['D'][str(a)+'x'+str(b)].shape[1]
+
+df=pd.concat([df, prin_comp89['D']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+d0+=prin_comp89['D']['central'].shape[1]
+
+
+#D+1
+d1+=d0      
 for a in range(1,7):
     for b in range(1,7):
       df=pd.concat([df, prin_comp89['D+1'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
-      
+      d1+=prin_comp89['D+1'][str(a)+'x'+str(b)].shape[1]
+
+df=pd.concat([df, prin_comp89['D+1']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+d1+=prin_comp89['D+1']['central'].shape[1]
+
+
+#D+2
+d2+=d1  
 for a in range(1,7):
     for b in range(1,7):
       df=pd.concat([df, prin_comp89['D+2'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
-      
+      d2+=prin_comp89['D+2'][str(a)+'x'+str(b)].shape[1]
+
+df=pd.concat([df, prin_comp89['D+2']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+d2+=prin_comp89['D+2']['central'].shape[1]
+
+#D+3
+d3+=d2   
 for a in range(1,7):
     for b in range(1,7):
       df=pd.concat([df, prin_comp89['D+3'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
-      
-df.columns = range(df.shape[1])            
-x_test=df 
+      d3+=prin_comp89['D+3'][str(a)+'x'+str(b)].shape[1]
+
+df=pd.concat([df, prin_comp89['D+3']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+d3+=prin_comp89['D+3']['central'].shape[1]
 
 
-
+df.columns = range(df.shape[1])      
 
 
 #Retirar nan das 00:00:00 horas do dia D
 #media de toda a df preenchida com o elemento anterior com toda a df preenchida com o elemento seguinte - valores nan dao a media dos 2 e os outros mantem-se
-x_test.iloc[:,0:d0] = (x_test.iloc[:,0:d0].ffill()+x_test.iloc[:,0:d0].bfill())/2
+df.iloc[:,0:d0] = (df.iloc[:,0:d0].ffill()+df.iloc[:,0:d0].bfill())/2
 
 #dia 31/05/2020 da previsao D
-x_test.iloc[-24:,0:d0] = x_test.iloc[-48:-24,0:d0].values
+df.iloc[-24:,0:d0] = df.iloc[-48:-24,0:d0].values
 
 #primeiro dia as 00:00:00 igual a 01:00:00 desse dia
-x_test.iloc[:,0:d0] = x_test.iloc[:,0:d0].bfill()
-
-#x_test.isnull().sum().sum()
-
-''' onde estao os nulls
-df_null = x_test.isnull().unstack()
-t = df_null[df_null]'''
+df.iloc[:,0:d0] = df.iloc[:,0:d0].bfill()
 
 
 
+
+
+
+
+df1=pd.DataFrame()
+#dados calculados
+for a in range(1,7):
+    for b in range(1,7):
+      df1=pd.concat([df1, prin_comp89['dados_calc']['lags'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+      df1=pd.concat([df1, prin_comp89['dados_calc']['leads'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+      df1=pd.concat([df1, prin_comp89['dados_calc']['media_prev'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+      df1=pd.concat([df1, prin_comp89['dados_calc']['media_temp'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+      df1=pd.concat([df1, prin_comp89['dados_calc']['var_temp'][str(a)+'x'+str(b)].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+
+df1=pd.concat([df1, prin_comp89['dados_calc']['lags']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+df1=pd.concat([df1, prin_comp89['dados_calc']['leads']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+df1=pd.concat([df1, prin_comp89['dados_calc']['media_prev']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+df1=pd.concat([df1, prin_comp89['dados_calc']['media_temp']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+df1=pd.concat([df1, prin_comp89['dados_calc']['var_temp']['central'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+
+df1=pd.concat([df1, prin_comp89['dados_calc']['dp_esp'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)      
+df1=pd.concat([df1, prin_comp89['dados_calc']['spatial_smoothing'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
+
+
+
+#tirar a x_train os dias que faltam a y_train para ficar sincrono
+df1 = (df.ffill()+df.bfill())/2
+
+df=pd.concat([df, df1], axis=1, sort=True)      
+
+df.columns = range(df.shape[1])      
+x_test=df 
 
 
 y_test = prin_comp89['D+1']['producao'].loc['2020-01-01':'2020/05/31']
-#y_test.isnull().sum().sum()
 
-#y_test.isnull().sum().sum()
 
-      
 
-########################### EM DESENVOLVIMENTO ################################
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def mape(y_test, y_pred): 
+    y_test, y_pred = np.array(y_test), np.array(y_pred)
+    return np.mean(np.abs((y_test - y_pred) / y_test))
+  
+  
+  
 #XGBoost_______________________________________________________________________
 
-train=xgb.DMatrix(x_train, label=y_train) #tutoriais dizem para fazer isto - ver porque
-test=xgb.DMatrix(x_test, label=y_test)
+          
+'''teste automatico
+i=0
+results = np.ones((3,20)) 
+for a in [0.1,0.2,0.3,0.4,0.5]:
+  params = {'eta': a,
+            'gamma': 0,
+            'max_depth': 8, 
+            
+            'min_child_weight': 3,
+            'max_delta_step': 0,
+            'lambda': 1,
+            'alpha': 0,
+            }   
+  xg = xgb.XGBRegressor(objective ='reg:squarederror', **params)
+  model=xg.fit(x_train.values, y_train.values)
+  y_pred = model.predict(x_test.values)  
+  xg_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+  xg_mae=mean_absolute_error(y_test, y_pred)    
+  
+  results[0,i]=a
+  results[1,i]=xg_rmse
+  results[2,i]=xg_mae
+  i+=1
+  
+results[1,:].min() #rmse
+results[1,:].argmin() #rmse
+
+results[2,:].min() #mae
+results[2,:].argmin() #mae'''
 
 
-params = {'max_depth': 5, #entre 5 e 9
-          'min_child_weight': 20, #entre 20 e 80
-          'eta': 0.05, #entre 0.01 e 0.05 
-          'subsample': 0.8 #80%
+
+params = {'eta': 0.09,
+          'gamma': 0,
+          'max_depth': 8, 
+          
+          'min_child_weight': 3,
+          'max_delta_step': 0,
+          'lambda': 1,
+          'alpha': 0
           }   
-epochs=10
 
-#parametros nao estao ajustdos por mim
-xg_reg = xgb.XGBRegressor(objective ='reg:linear', colsample_bytree = 0.3, learning_rate = 0.1, max_depth = 5, alpha = 10, n_estimators = 10)
+  
+xg = xgb.XGBRegressor(objective ='reg:squarederror', **params)
 
-model=xg_reg.fit(x_train.values,y_train.values)
+model=xg.fit(x_train.values, y_train.values)
 
 y_pred = model.predict(x_test.values)    
     
 xg_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-print("RMSE: %f" % (xg_rmse))    
-
+xg_rmse
 xg_mae=mean_absolute_error(y_test, y_pred)      
-print("MAE: %f" % (xg_mae))    
-          
+xg_mae
+#xg_mape=mape(y_test, y_pred)
 
 
+
+
+
+
+
+
+
+########################### EM DESENVOLVIMENTO ################################
+
+  
 #GBT___________________________________________________________________________
 
 #definir hyperparameters que fala no paper
@@ -1247,6 +1924,7 @@ params = {'max_depth': 5, #entre 5 e 9
           'n_estimators': 500, #entre 500 e 800 
           'subsample': 0.8 #80%
           }
+
 
 #criar regressor
 reg = GradientBoostingRegressor(**params)
