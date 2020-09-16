@@ -1416,7 +1416,7 @@ prin_comp95['D+3']['producao']=pd.DataFrame(data=df, index=df.index)
 
 
 #dados calculados
-df=dados_calc['dp_esp']['D']
+
 prin_comp95['dados_calc']={}
 prin_comp89['dados_calc']={}
 prin_comp95['dados_calc']['lags']={}
@@ -1430,7 +1430,7 @@ prin_comp89['dados_calc']['media_temp']={}
 prin_comp95['dados_calc']['var_temp']={}
 prin_comp89['dados_calc']['var_temp']={}
 
-
+df=dados_calc['dp_esp']['D']
 
 
 pca = PCA(.95) #numero componentes que prefazem 95%
@@ -1840,7 +1840,7 @@ y_test = prin_comp89['D+1']['producao'].loc['2020-01-01':'2020/05/31']
 
 def mape(y_test, y_pred): 
     y_test, y_pred = np.array(y_test), np.array(y_pred)
-    return np.mean(np.abs((y_test - y_pred) / y_test))
+    return np.mean(np.abs((y_test - y_pred) / np.mean(y_test)))
   
   
   
@@ -1850,15 +1850,15 @@ def mape(y_test, y_pred):
 '''teste automatico
 i=0
 results = np.ones((3,20)) 
-for a in [0.1,0.2,0.3,0.4,0.5]:
-  params = {'eta': a,
-            'gamma': 0,
+for a in [1,2,3,4,5,6,7,8,9,10]:
+  params = {'eta': 0.09,
+            'gamma': 0.07,
             'max_depth': 8, 
             
-            'min_child_weight': 3,
+            'min_child_weight': 1,
             'max_delta_step': 0,
             'lambda': 1,
-            'alpha': 0,
+            'alpha': 0.15,
             }   
   xg = xgb.XGBRegressor(objective ='reg:squarederror', **params)
   model=xg.fit(x_train.values, y_train.values)
@@ -1880,13 +1880,13 @@ results[2,:].argmin() #mae'''
 
 
 params = {'eta': 0.09,
-          'gamma': 0,
+          'gamma': 0.07,
           'max_depth': 8, 
           
-          'min_child_weight': 3,
+          'min_child_weight': 1,
           'max_delta_step': 0,
           'lambda': 1,
-          'alpha': 0
+          'alpha': 0.15
           }   
 
   
@@ -1900,6 +1900,9 @@ xg_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 xg_rmse
 xg_mae=mean_absolute_error(y_test, y_pred)      
 xg_mae
+
+
+
 #xg_mape=mape(y_test, y_pred)
 
 
