@@ -13,17 +13,17 @@ import statsmodels.formula.api as smf
 import pvlib
 from pvlib import clearsky, atmosphere, solarposition
 from pvlib.location import Location
-from pvlib.iotools import read_tmy3
 from sklearn.decomposition import PCA
 from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.datasets import make_regression
-from sklearn.metrics import r2_score
 from sklearn.model_selection import GridSearchCV
+from sklearn import metrics
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import mean_absolute_error
 import xgboost as xgb
 from catboost import CatBoostRegressor
 from sklearn.preprocessing import MinMaxScaler
+import properscoring as ps
+from scipy.stats import norm
 
 
 
@@ -449,12 +449,7 @@ for dia in range(0,4):
                 df['irr_norm'] = np.where(df['irr_norm']>0, (df[df.columns[2]]+10)/(df[df.columns[7]]+10), df['irr_norm'])  
                 nwpgrid['D+3'][str(a)+'x'+str(b)]=df 
         
-    
-'''teste do csm num ponto aleatorio da grid -> OK!
-local = Location(location[6,6,0], location[6,6,1])
-time = dados['D+2'].index
-cs = local.get_clearsky(time)
-'''       
+
         
         
 #Weighted quantile regression _________________________________________________
@@ -901,7 +896,6 @@ for a in range(1,7):
 df=pd.DataFrame()
 aux=nwpgrid['D']['central']
     
-
 #direcao vento
 df=df.assign(dir_med3=aux[aux.columns[4]].rolling(window=3, center=True).mean())
 df=df.assign(dir_med7=aux[aux.columns[4]].rolling(window=7, center=True).mean())
@@ -1231,6 +1225,8 @@ dados_calc['spatial_smoothing']= {'D': {'layers': aux[['irr_med1', 'irr_med2', '
 a cada serie de dados de cada ponto da grid - tambem inclui o da central'''
 
 
+#3282 variáveis -> PCA -> 983 variáveis
+
 prin_comp95 = {
     'D': {},
     'D+1': {},
@@ -1455,7 +1451,7 @@ for a in range(1,7):
       pca.fit(df)
       prin_comp89['dados_calc']['lags'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
 
-      
+          
       df=dados_calc['leads']['D'][str(a)+'x'+str(b)]
       
       pca = PCA(.95) #numero componentes que prefazem 95%
@@ -1465,7 +1461,7 @@ for a in range(1,7):
       pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
       prin_comp89['dados_calc']['leads'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
-
+      
 
       df=dados_calc['media_prev'][str(a)+'x'+str(b)]
       
@@ -1511,7 +1507,7 @@ pca = PCA(.89) #numero componentes que prefazem 89%
 pca.fit(df)
 prin_comp89['dados_calc']['lags']['central']=pd.DataFrame(data=pca.transform(df), index=df.index)
       
-      
+    
 df=dados_calc['leads']['D']['central']
       
 pca = PCA(.95) #numero componentes que prefazem 95%
@@ -1681,9 +1677,12 @@ df1=pd.concat([df1, prin_comp89['dados_calc']['spatial_smoothing'].loc['2017-01-
 
 #tirar a x_train os dias que faltam a y_train para ficar sincrono
 df1=pd.concat([df1.loc['2017-01-02':'2019-02-27'], df1.loc['2019-03-03':'2019-04-05'], df1.loc['2019-04-09':'2019/12/31']])
-df1 = (df.ffill()+df.bfill())/2
+df1 = (df1.ffill()+df1.bfill())/2
 
 df=pd.concat([df, df1], axis=1, sort=True)      
+
+df=df.loc['2017-01-04':'2019/12/31']
+
 
 df.columns = range(df.shape[1])      
 x_train=df 
@@ -1696,7 +1695,7 @@ t = df_null[df_null]'''
 
 
 y_train = prin_comp89['D+1']['producao'].loc['2017-01-01':'2019/12/31']
-y_train=pd.concat([y_train.loc['2017-01-02':'2019-02-27'], y_train.loc['2019-03-03':'2019-04-05'], y_train.loc['2019-04-09':'2019/12/31']])
+y_train=pd.concat([y_train.loc['2017-01-04':'2019-02-27'], y_train.loc['2019-03-03':'2019-04-05'], y_train.loc['2019-04-09':'2019/12/31']])
 
 #y_train.isnull().sum().sum()
 
@@ -1793,17 +1792,18 @@ df1=pd.concat([df1, prin_comp89['dados_calc']['dp_esp'].loc['2020-01-01':'2020/0
 df1=pd.concat([df1, prin_comp89['dados_calc']['spatial_smoothing'].loc['2020-01-01':'2020/05/31']], axis=1, sort=True)
 
 
-
-#tirar a x_train os dias que faltam a y_train para ficar sincrono
-df1 = (df.ffill()+df.bfill())/2
+#retirar os nan
+df1 = (df1.ffill()+df1.bfill())/2
+df1 = df1.loc['2020-01-01':'2020/05/30']
+df1 = df1.bfill()
 
 df=pd.concat([df, df1], axis=1, sort=True)      
-
+df=df.loc['2020-01-01':'2020/05/30']
 df.columns = range(df.shape[1])      
 x_test=df 
 
 
-y_test = prin_comp89['D+1']['producao'].loc['2020-01-01':'2020/05/31']
+y_test = prin_comp89['D+1']['producao'].loc['2020-01-01':'2020/05/30']
 
 
 
@@ -1838,9 +1838,9 @@ y_test = prin_comp89['D+1']['producao'].loc['2020-01-01':'2020/05/31']
 
 
 
-def mape(y_test, y_pred): 
-    y_test, y_pred = np.array(y_test), np.array(y_pred)
-    return np.mean(np.abs((y_test - y_pred) / np.mean(y_test)))
+def mape(test_array, pred_array): 
+    test_array, pred_array = np.array(test_array), np.array(pred_array)
+    return np.mean(np.abs((test_array - pred_array) / np.mean(test_array)))
   
   
   
@@ -1849,10 +1849,10 @@ def mape(y_test, y_pred):
           
 '''teste automatico
 i=0
-results = np.ones((3,20)) 
-for a in [1,2,3,4,5,6,7,8,9,10]:
-  params = {'eta': 0.09,
-            'gamma': 0.07,
+results = np.ones((5,20)) 
+for a in [0.1, 0.12, 0.13, 0.14, 0.15, 0.16]:
+  params = {'eta': 0.07,
+            'gamma': 0.09,
             'max_depth': 8, 
             
             'min_child_weight': 1,
@@ -1863,24 +1863,29 @@ for a in [1,2,3,4,5,6,7,8,9,10]:
   xg = xgb.XGBRegressor(objective ='reg:squarederror', **params)
   model=xg.fit(x_train.values, y_train.values)
   y_pred = model.predict(x_test.values)  
+  y_pred = y_pred = y_pred.reshape(-1, 1)   
   xg_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
   xg_mae=mean_absolute_error(y_test, y_pred)    
-  
+  xg_mape=mape(y_test, y_pred)
+  xg_crps=ps.crps_gaussian(y_pred, mu=0, sig=1).mean()
+
   results[0,i]=a
   results[1,i]=xg_rmse
   results[2,i]=xg_mae
+  results[3,i]=xg_mape
+  results[4,i]=xg_crps
   i+=1
   
-results[1,:].min() #rmse
-results[1,:].argmin() #rmse
+results[3,:].min() #mape
+results[3,:].argmin() #mape
 
-results[2,:].min() #mae
-results[2,:].argmin() #mae'''
+results[4,:].min() #crps
+results[4,:].argmin() #crps
+'''
 
 
-
-params = {'eta': 0.09,
-          'gamma': 0.07,
+params = {'eta': 0.07,
+          'gamma': 0.09,
           'max_depth': 8, 
           
           'min_child_weight': 1,
@@ -1894,22 +1899,22 @@ xg = xgb.XGBRegressor(objective ='reg:squarederror', **params)
 
 model=xg.fit(x_train.values, y_train.values)
 
-y_pred = model.predict(x_test.values)    
+y_pred = model.predict(x_test.values) 
+y_pred = y_pred.reshape(-1, 1)   
     
 xg_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 xg_rmse
+
 xg_mae=mean_absolute_error(y_test, y_pred)      
 xg_mae
 
+xg_mape=mape(y_test, y_pred)
+xg_mape
 
+xg_crps=ps.crps_gaussian(y_pred, mu=0, sig=1).mean()
+xg_crps
 
-#xg_mape=mape(y_test, y_pred)
-
-
-
-
-
-
+    
 
 
 
@@ -1937,7 +1942,6 @@ model=reg.fit(x_train, y_train.values.ravel())
 y_pred=model.predict(x_test)
 
 
-'''DUVIDA: y_pred da valores negativos '''
 
 gbt_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
 print("RMSE: %f" % (gbt_rmse))   
