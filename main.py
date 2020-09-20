@@ -24,7 +24,7 @@ from catboost import CatBoostRegressor
 from sklearn.preprocessing import MinMaxScaler
 import properscoring as ps
 from scipy.stats import norm
-
+import lightgbm as lgb
 
 
 ##### Importar dados ##########################################################
@@ -896,6 +896,13 @@ for a in range(1,7):
 df=pd.DataFrame()
 aux=nwpgrid['D']['central']
     
+
+'''df=df.assign(temp_med3=aux[aux.columns[0]].rolling(window=3, center=True).mean())
+df=df.assign(pres_med3=aux[aux.columns[2]].rolling(window=3, center=True).mean())
+df=df.assign(vel_med3=aux[aux.columns[3]].rolling(window=3, center=True).mean())
+df=df.assign(hum_med3=aux[aux.columns[5]].rolling(window=3, center=True).mean())'''
+
+
 #direcao vento
 df=df.assign(dir_med3=aux[aux.columns[4]].rolling(window=3, center=True).mean())
 df=df.assign(dir_med7=aux[aux.columns[4]].rolling(window=7, center=True).mean())
@@ -1450,7 +1457,7 @@ for a in range(1,7):
       pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
       prin_comp89['dados_calc']['lags'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
-
+      
           
       df=dados_calc['leads']['D'][str(a)+'x'+str(b)]
       
@@ -1472,7 +1479,7 @@ for a in range(1,7):
       pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
       prin_comp89['dados_calc']['media_prev'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
-
+      
 
       df=dados_calc['media_temp']['D'][str(a)+'x'+str(b)]
       
@@ -1483,7 +1490,7 @@ for a in range(1,7):
       pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
       prin_comp89['dados_calc']['media_temp'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
-
+      
 
       df=dados_calc['var_temp']['D'][str(a)+'x'+str(b)]
       
@@ -1494,7 +1501,7 @@ for a in range(1,7):
       pca = PCA(.89) #numero componentes que prefazem 89%
       pca.fit(df)
       prin_comp89['dados_calc']['var_temp'][str(a)+'x'+str(b)]=pd.DataFrame(data=pca.transform(df), index=df.index)
-
+      
 
       
 df=dados_calc['lags']['D']['central']
@@ -1850,9 +1857,9 @@ def mape(test_array, pred_array):
 '''teste automatico
 i=0
 results = np.ones((5,20)) 
-for a in [0.1, 0.12, 0.13, 0.14, 0.15, 0.16]:
+for a in [0,0.5,0.9,1]:
   params = {'eta': 0.07,
-            'gamma': 0.09,
+            'gamma': 0.01,
             'max_depth': 8, 
             
             'min_child_weight': 1,
@@ -1884,15 +1891,16 @@ results[4,:].argmin() #crps
 '''
 
 
+
 params = {'eta': 0.07,
-          'gamma': 0.09,
+          'gamma': 0.01,
           'max_depth': 8, 
           
           'min_child_weight': 1,
           'max_delta_step': 0,
           'lambda': 1,
-          'alpha': 0.15
-          }   
+          'alpha': 0.15,
+          }    
 
   
 xg = xgb.XGBRegressor(objective ='reg:squarederror', **params)
@@ -1918,79 +1926,117 @@ xg_crps
 
 
 
-########################### EM DESENVOLVIMENTO ################################
+
+
+#CatBoost______________________________________________________________________
+   
+params = {'loss_function': 'MAPE', # objective function
+          'eval_metric': 'MAPE', # metric
+          
+          'learning_rate': 0.07,
+          'depth': 8,
+          'l2_leaf_reg': 1
+         }
+cb = CatBoostRegressor(**params)
+model=cb.fit(x_train, y_train, eval_set=(x_test, y_test), use_best_model=True, plot=True);
+   
+y_pred = model.predict(x_test.values)
+y_pred = y_pred.reshape(-1, 1)   
+
+cb_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+cb_rmse
+
+cb_mae=mean_absolute_error(y_test, y_pred)      
+cb_mae   
+    
+cb_mape=mape(y_test, y_pred)
+cb_mape
+
+cb_crps=ps.crps_gaussian(y_pred, mu=0, sig=1).mean()
+cb_crps
+    
+
+
+
+
+
+
+
+#LightGBM______________________________________________________________________
+
+train_data = lgb.Dataset(x_train, label=y_train)
+test_data = lgb.Dataset(x_test, label=y_test)
+
+params = {
+    'application': 'mape',
+    'objective': 'mape',
+    'learning_rate': 0.07,
+    'max_depth': 8,
+    'min_sum_hessian_in_leaf':1,
+    'max_delta_step': 0,
+    'lambda_l1': 0.15,
+    'lambda_l2':1
+}
+
+model = lgb.train(params, train_data, valid_sets=test_data, num_boost_round=5000)
+
+y_pred = model.predict(x_test.values)
+y_pred = y_pred.reshape(-1, 1)   
+
+lgb_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+lgb_rmse
+
+lgb_mae=mean_absolute_error(y_test, y_pred)      
+lgb_mae
+    
+lgb_mape=mape(y_test, y_pred)
+lgb_mape
+
+lgb_crps=ps.crps_gaussian(y_pred, mu=0, sig=1).mean()
+lgb_crps
+    
+
+  
+    
 
   
 #GBT___________________________________________________________________________
 
 #definir hyperparameters que fala no paper
-params = {'max_depth': 5, #entre 5 e 9
+params = {'max_depth': 8, #entre 5 e 9
           'min_samples_split': 150, #entre 150 e 350
           'min_samples_leaf': 20, #entre 20 e 80
           'max_features': 'sqrt', #square root of total number of features
-          'learning_rate': 0.05, #entre 0.01 e 0.05 
+          'learning_rate': 0.07, #entre 0.01 e 0.05 
           'n_estimators': 500, #entre 500 e 800 
           'subsample': 0.8 #80%
           }
 
 
 #criar regressor
-reg = GradientBoostingRegressor(**params)
+gbt = GradientBoostingRegressor(**params)
 #treinar modelo
-model=reg.fit(x_train, y_train.values.ravel())
+model=gbt.fit(x_train, y_train.values.ravel())
 #prever resposta ao dataset de teste
 y_pred=model.predict(x_test)
+y_pred = y_pred.reshape(-1, 1)   
 
 
 
 gbt_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-print("RMSE: %f" % (gbt_rmse))   
+gbt_rmse
 
 gbt_mae=mean_absolute_error(y_test, y_pred)      
-print("MAE: %f" % (gbt_mae)) 
+gbt_mae
 
-#Hyperparameters tunning
-'''
-params = {'max_depth': np.arange(5,9,2), #entre 5 e 9
-          'min_samples_split': np.arange(150,350,100), #entre 150 e 350
-          'min_samples_leaf': np.arange(20,80,30), #entre 20 e 80
-          'learning_rate': np.arange(0.01,0.05,0.01), #entre 0.01 e 0.05 
-          'n_estimators': np.arange(500,800,100) #entre 500 e 800 
-          }
-'''
+gbt_mape=mape(y_test, y_pred)
+gbt_mape
 
-params = {'max_depth':[5,9], #entre 5 e 9
-          'min_samples_split':[150,350], #entre 150 e 350
-          'min_samples_leaf': [20,80], #entre 20 e 80
-          'learning_rate': [0.01,0.05], #entre 0.01 e 0.05 
-          'n_estimators': [500,800] #entre 500 e 800 
-          }
-tuning = GridSearchCV(estimator = GradientBoostingRegressor(max_features='sqrt',subsample=0.8), param_grid=params, scoring='r2')
-tuning.fit(x_train, y_train.values.ravel()) #muito lento - nao consegui ainda obter resultados
-tuning.best_params_, tuning.best_score_  
+gbt_crps=ps.crps_gaussian(y_pred, mu=0, sig=1).mean()
+gbt_crps
 
 
 
-
-    
-#CatBoost______________________________________________________________________
-      
-# Initialize CatBoostRegressor
-cb_reg = CatBoostRegressor(iterations=2, learning_rate=1, depth=2)
-# Fit model
-model=cb_reg.fit(x_train.values, y_train.values)
-# Get predictions
-y_pred = model.predict(x_test.values)
-    
-cb_rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-print("RMSE: %f" % (cb_rmse))
-
-cb_mae=mean_absolute_error(y_test, y_pred)      
-print("MAE: %f" % (cb_mae))    
-    
-    
-    
-    
     
     
     
